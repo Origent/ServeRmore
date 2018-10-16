@@ -1,0 +1,19 @@
+git:
+    repo: git@github.com:Origent/serve-R-less.git
+    private_key: github.pem
+aws:
+    base_dir:
+    private_key: aws.pem
+    subnet:
+    ssh_sec_group:
+    default_sec_group:
+builder:
+    vm_ami: ami-4fffc834
+    vm_instance_type: t2.medium
+    vm_instance_id:
+    vm_domain_name:
+    vm_public_ip:
+    lambda_s3_bucket:
+    lambda_s3_key:
+    lambda_handler_path:
+    lambda_function_name:
