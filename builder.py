@@ -123,6 +123,12 @@ class Builder:
         cloud_connect.run_ssh("sudo yum -y install python27-devel python27-pip gcc gcc-c++ readline-devel libgfortran.x86_64 R.x86_64")
         cloud_connect.run_ssh("pip install --upgrade pip")
         cloud_connect.upload_file_ssh(self.cc.settings["builder"]["py_handler_path"]+"/", '/home/ec2-user/', 'package_install.R')
+
+        # Create package_install.R script
+        # For loop to read in yaml R package names and install
+        #  install.packages('', repos='http://cran.us.r-project.org')
+        #
+        
         cloud_connect.terminate_ssh()
         print("Running R Package Installs")
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])

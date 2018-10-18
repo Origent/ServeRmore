@@ -24,13 +24,6 @@ class SSHConnect:
         print("SSH Tunnel Connected - please type Ctrl-C to terminate.")
         result = subprocess.call(COMMAND,shell=True)
 
-    def evoke_multitunnel(self, tunnel_str, connect_str, private_key):
-        import subprocess
-        import sys
-        COMMAND="ssh -i ~/.ssh/"+private_key+" -F ~/.ssh/config -N " + tunnel_str + " " + connect_str + " -o TCPKeepAlive=yes -o ServerAliveInterval=50 -o ExitOnForwardFailure=yes"
-        print("SSH Tunnel Connected - please type Ctrl-C to terminate.")
-        result = subprocess.call(COMMAND,shell=True)
-
     def initiate_ssh(self,user,key,domain):
         self.user_name = user
         self.private_key = key
@@ -57,11 +50,6 @@ class SSHConnect:
     def run_ssh(self,cmd):
         stdin, stdout, stderr = self.client.exec_command(cmd)
         self.wait_for_command(stdout)
-
-    def upload_key_ssh(self, value):
-        sftp = self.client.open_sftp()
-        sftp.chdir('/home/'+self.user_name+'/.ssh')
-        sftp.put(str(Path.home())+'/.ssh/'+value, str(sftp.getcwd())+'/'+value)
 
     def upload_file_ssh(self, local_path, remote_path, value):
         sftp = self.client.open_sftp()

@@ -1,21 +1,21 @@
 
-import sys, config, builder
+import sys, builder
 
 #1 - R package with methods
 #2 - R model in storage
-builder_instance = builder.Builder()
 
-#3 - create VM
+#3 - create
+builder_instance = builder.Builder()
 builder_instance.create()
 
-#4 - push
-builder_instance.push_handler()
+#4 - update
+builder_instance.update()
 
 #5 - package
-builder_instance.package_to_s3()
+builder_instance.package()
 
 #6 - deploy
-builder_instance.update_lambda()
+builder_instance.deploy()
 
 #7 - test
-#builder_instance.status()
+builder_instance.test()

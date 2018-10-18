@@ -2,8 +2,8 @@
 
 ## Assumptions
 
-  * 1: We will be using Github.com for source control.
-  * 2: We will be using AWS for our cloud provider.
+  * 1: We will be using Github for source control.
+  * 2: We will be using Amazon Web Services for our cloud provider.  You have the main account or an account with admin access.
 
 ## Standard Technical Configuration
 

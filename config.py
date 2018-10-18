@@ -6,6 +6,7 @@ from pathlib import Path
 class CloudConfig:
 
     def __init__(self):
+        # if config doesn't exist, copy over new one
         self.file = str(Path.home())+"/.serve-R-less.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
@@ -14,6 +15,7 @@ class CloudConfig:
         self.set("aws", "base_dir", os.getcwd())
 
     def ask(self, compute_type):
+        # Check for all values in yaml
         if not "repo" in self.settings["git"] or not self.settings["git"]["repo"]:
             git_repo = input("Please provide your Github Repo. (format: git@github.com:Origent/r-on-serverless.git)\n SSH URL: ")
             if not git_repo:
