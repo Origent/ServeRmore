@@ -9,23 +9,26 @@ class Builder:
         self.cc.ask("builder")
         self.name_str = 'Lambda Builder'
 
-    def create(self):
+    def setup(self):
+        self.cc.load()
+
+    def create(self, name):
         import boto3
         self.name_str = str(name) + ' ' + str(self.name_str)
         prompt1_str = "New Lambda Builder ID: "
         prompt2_str = "Lambda Builder already exists."
-        if not self.cc.settings["builder"]["vm_instance_id"]:
+        if not self.cc.settings["builder"]["instance_id"]:
             ec2 = boto3.resource('ec2')
             instance = ec2.create_instances(
                 SecurityGroupIds=[
-                    str(self.cc.settings["aws"]["ssh_sec_group"]),
+                    str(self.cc.settings["aws"]["sec_group"]),
                 ],
                 SubnetId=str(self.cc.settings["aws"]["subnet"]),
-                ImageId=str(self.cc.settings["builder"]["vm_ami"]),
+                ImageId=str(self.cc.settings["builder"]["ami"]),
                 KeyName=str(self.cc.settings["aws"]["private_key"].replace('.pem', '')),
                 MinCount=1,
                 MaxCount=1,
-                InstanceType=str(self.cc.settings["builder"]["vm_instance_type"]),
+                InstanceType=str(self.cc.settings["builder"]["instance_type"]),
                 TagSpecifications=[
                     {
                         'ResourceType': 'instance',
@@ -39,17 +42,17 @@ class Builder:
                 ])
             print("Please wait for Builder bootup.")
             time.sleep(5)
-            self.cc.set("builder", "vm_instance_id", instance[0].instance_id)
-            print(prompt1_str + self.cc.settings["builder"]["vm_instance_id"])
+            self.cc.set("builder", "instance_id", instance[0].instance_id)
+            print(prompt1_str + self.cc.settings["builder"]["instance_id"])
             state = 'pending'
             while not state == 'running':
                 time.sleep(5)
-                instance = ec2.Instance(self.cc.settings["builder"]["vm_instance_id"])
+                instance = ec2.Instance(self.cc.settings["builder"]["instance_id"])
                 state = instance.state["Name"]
                 print("STATUS: "+state)
             time.sleep(5)
-            self.cc.set("builder", "vm_domain_name", instance.public_dns_name)
-            self.cc.set("builder", "vm_public_ip", instance.public_ip_address)
+            self.cc.set("builder", "domain_name", instance.public_dns_name)
+            self.cc.set("builder", "public_ip", instance.public_ip_address)
             print("Proceeding with bootstrapping Builder.")
             time.sleep(20)
             self.bootstrap()
@@ -57,7 +60,7 @@ class Builder:
             print(prompt2_str)
 
     def status(self):
-        if self.cc.settings["builder"]["vm_instance_id"]:
+        if self.cc.settings["builder"]["instance_id"]:
             import boto3
             client = boto3.client('ec2')
             response = client.describe_instance_status(
@@ -70,43 +73,42 @@ class Builder:
                     },
                 ],
                 InstanceIds=[
-                    self.cc.settings["builder"]["vm_instance_id"]
+                    self.cc.settings["builder"]["instance_id"]
                 ]
             )
             print(response)
-
         else:
             print("No Lambda Builder instance is running.")
 
     def terminate(self):
         if input("are you sure? (y/n) ") == "y":
-            if self.cc.settings["builder"]["vm_instance_id"]:
+            if self.cc.settings["builder"]["instance_id"]:
                 import boto3
                 ec2 = boto3.resource('ec2')
-                response = ec2.instances.filter(InstanceIds=[self.cc.settings["builder"]["vm_instance_id"]]).terminate()
-                self.cc.set("builder", "vm_instance_id", '')
-                self.cc.set("builder", "vm_domain_name", '')
-                self.cc.set("builder", "vm_public_ip", '')
+                response = ec2.instances.filter(InstanceIds=[self.cc.settings["builder"]["instance_id"]]).terminate()
+                self.cc.set("builder", "instance_id", '')
+                self.cc.set("builder", "domain_name", '')
+                self.cc.set("builder", "public_ip", '')
                 print(response)
             else:
                 return False
 
     def ssh(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.evoke_ssh('ec2-user',self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.evoke_ssh('ec2-user',self.cc.settings["builder"]["domain_name"])
 
     def sftp(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.evoke_sftp('ec2-user',self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.evoke_sftp('ec2-user',self.cc.settings["builder"]["domain_name"])
 
     def bootstrap(self):
         self.upload_aws()
         self.init_builder()
-        self.init_pvenv()
+        #self.init_pvenv()
 
     def upload_aws(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("pip install awscli --upgrade --user")
         cloud_connect.run_ssh("mkdir ~/.aws")
         cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
@@ -117,28 +119,25 @@ class Builder:
 
     def init_builder(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y upgrade")
         cloud_connect.run_ssh("sudo yum -y install python27-devel python27-pip gcc gcc-c++ readline-devel libgfortran.x86_64 R.x86_64")
         cloud_connect.run_ssh("pip install --upgrade pip")
-        cloud_connect.upload_file_ssh(self.cc.settings["builder"]["py_handler_path"]+"/", '/home/ec2-user/', 'package_install.R')
-
-        # Create package_install.R script
-        # For loop to read in yaml R package names and install
-        #  install.packages('', repos='http://cran.us.r-project.org')
-        #
-        
+        cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
+            "aws_secret_access_key = "+cloud_connect.get_aws_secret_key()+"\" > ~/.aws/credentials")
+        for package in self.cc.settings["builder"]["r_packages"]:
+            cloud_connect.run_ssh("echo \"install.packages('"+package+"', repos='http://cran.us.r-project.org')\">> ~/package_install.R")
         cloud_connect.terminate_ssh()
         print("Running R Package Installs")
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo Rscript package_install.R")
         print("Finished R Package Installs")
         cloud_connect.terminate_ssh()
 
     def init_pvenv(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && pip install 'rpy2<2.9.0'")
         cloud_connect.run_ssh("mkdir $HOME/packaging && cd $HOME/packaging")
         cloud_connect.run_ssh("sudo rm /usr/lib64/R/lib/libRrefblas.so")
@@ -168,24 +167,24 @@ class Builder:
 
     def push_handler(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
-        cloud_connect.upload_file_ssh(self.cc.settings["builder"]["lambda_handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package_to_s3(self):
         cloud_connect = connect.SSHConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["vm_domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
         cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+
-        self.cc.settings["builder"]["lambda_s3_bucket"]+"/"+self.cc.settings["builder"]["lambda_s3_key"])
+        self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"])
         cloud_connect.terminate_ssh()
 
     def update_lambda(self):
         import boto3
         client = boto3.client('lambda')
         response = client.update_function_code(
-            FunctionName=self.cc.settings["builder"]["lambda_function_name"],
-            S3Bucket=self.cc.settings["builder"]["lambda_s3_bucket"],
-            S3Key=self.cc.settings["builder"]["lambda_s3_key"],
+            FunctionName=self.cc.settings["lambda"]["name"],
+            S3Bucket=self.cc.settings["aws"]["s3_bucket"],
+            S3Key=self.cc.settings["aws"]["s3_key"],
         )
         print(response)

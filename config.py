@@ -6,7 +6,6 @@ from pathlib import Path
 class CloudConfig:
 
     def __init__(self):
-        # if config doesn't exist, copy over new one
         self.file = str(Path.home())+"/.serve-R-less.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
@@ -15,7 +14,6 @@ class CloudConfig:
         self.set("aws", "base_dir", os.getcwd())
 
     def ask(self, compute_type):
-        # Check for all values in yaml
         if not "repo" in self.settings["git"] or not self.settings["git"]["repo"]:
             git_repo = input("Please provide your Github Repo. (format: git@github.com:Origent/r-on-serverless.git)\n SSH URL: ")
             if not git_repo:
@@ -31,19 +29,23 @@ class CloudConfig:
             if not aws_private_key:
                 aws_private_key = "aws.pem"
             self.set("aws", "private_key", aws_private_key)
-        if compute_type == "builder":
-            if not "lambda_handler_path" in self.settings["builder"] or not self.settings["builder"]["lambda_handler_path"]:
-                py_handler_path = input("Please provide the path to your AWS Lambda handler.py function\n FILE PATH NAME: ")
-                self.set("builder", "lambda_handler_path", py_handler_path)
-            if not "lambda_function_name" in self.settings["builder"] or not self.settings["builder"]["lambda_function_name"]:
-                api_function_name = input("Please provide the AWS Lambda function name that we will update. \n AWS Lambda Function Name: ")
-                self.set("builder", "lambda_function_name", api_function_name)
-            if not "lambda_s3_bucket" in self.settings["builder"] or not self.settings["builder"]["lambda_s3_bucket"]:
-                s3_lambda_bucket = input("Please provide the AWS S3 Bucket name hosting the Lambda package. \n AWS Lambda S3 Bucket: ")
-                self.set("builder", "lambda_s3_bucket", s3_lambda_bucket)
-            if not "lambda_s3_key" in self.settings["builder"] or not self.settings["builder"]["lambda_s3_key"]:
-                s3_lambda_key = input("Please provide the AWS S3 folder path and file name excluding the bucket name. \n AWS Lambda S3 Folder path & filename: ")
-                self.set("builder", "lambda_s3_key", s3_lambda_key)
+        if not "subnet" in self.settings["aws"] or not self.settings["aws"]["subnet"]:
+            aws_subnet = input("Please provide the subnet ID.\n ID: ")
+            if aws_subnet:
+                self.set("aws", "subnet", aws_subnet)
+        if not "sec_group" in self.settings["aws"] or not self.settings["aws"]["sec_group"]:
+            aws_sec_group = input("Please provide a Security Group with the SSH port open.\n ID: ")
+            if aws_sec_group:
+                self.set("aws", "sec_group", aws_sec_group)
+        if not "s3_bucket" in self.settings["aws"] or not self.settings["aws"]["s3_bucket"]:
+            s3_lambda_bucket = input("Please provide the AWS S3 Bucket name hosting the Lambda package. \n AWS Lambda S3 Bucket: ")
+            self.set("aws", "s3_bucket", s3_lambda_bucket)
+        if not "s3_key" in self.settings["aws"] or not self.settings["aws"]["s3_key"]:
+            s3_lambda_key = input("Please provide the AWS S3 folder path and file name excluding the bucket name. \n AWS Lambda S3 Folder path & filename: ")
+            self.set("aws", "s3_key", s3_lambda_key)
+        if not "name" in self.settings["lambda"] or not self.settings["lambda"]["name"]:
+            api_function_name = input("Please provide the AWS Lambda function name that we will update. \n AWS Lambda Function Name: ")
+            self.set("lambda", "name", api_function_name)
 
     def show(self):
         if not self.exists():
@@ -96,3 +98,27 @@ class CloudConfig:
             return True
         else:
             return False
+
+    def reset(self):
+        return yaml.load("""
+        git:
+            repo: git@github.com:Origent/serve-R-less.git
+            private_key: github.pem
+        aws:
+            s3_bucket:
+            s3_key:
+            private_key: aws.pem
+            base_dir:
+            subnet:
+            sec_group:
+        builder:
+            ami: ami-4fffc834
+            instance_type: t2.medium
+            instance_id:
+            domain_name:
+            public_ip:
+            r_packages: ['survival', 'gbm', 'jsonlite']
+        lambda:
+            name:
+            handler:
+        """)
