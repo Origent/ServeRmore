@@ -1,13 +1,13 @@
 
-import sys, builder
+import serveRless
 
 #1 - R package with methods
 #2 - R model in storage
 
 #3 - create
-builder_instance = builder.Builder()
+builder_instance = serveRless.Builder()
 #builder_instance.setup()
-builder_instance.create("adc_test")
+#builder_instance.create("adc_test")
 #builder_instance.ssh()
 #builder_instance.terminate()
 

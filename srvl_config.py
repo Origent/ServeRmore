@@ -13,39 +13,28 @@ class CloudConfig:
         self.load_all()
         self.set("aws", "base_dir", os.getcwd())
 
-    def ask(self, compute_type):
-        if not "repo" in self.settings["git"] or not self.settings["git"]["repo"]:
-            git_repo = input("Please provide your Github Repo. (format: git@github.com:Origent/r-on-serverless.git)\n SSH URL: ")
-            if not git_repo:
-                git_repo = "git@github.com:Origent/r-on-serverless.git"
-            self.set("git", "repo", git_repo)
-        if not "private_key" in self.settings["git"] or not self.settings["git"]["private_key"]:
-            git_private_key = input("Please provide the name of your Git Repo Private Key in ~/.ssh. (default: github.pem)\n KEY NAME: ")
-            if not git_private_key:
-                git_private_key = "github.pem"
-            self.set("git", "private_key", git_private_key)
-        if not "private_key" in self.settings["aws"] or not self.settings["aws"]["private_key"]:
-            aws_private_key = input("Please provide the name of your Github Private Key stored in ~/.ssh. (default: aws.pem)\n KEY NAME: ")
-            if not aws_private_key:
-                aws_private_key = "aws.pem"
-            self.set("aws", "private_key", aws_private_key)
-        if not "subnet" in self.settings["aws"] or not self.settings["aws"]["subnet"]:
-            aws_subnet = input("Please provide the subnet ID.\n ID: ")
-            if aws_subnet:
-                self.set("aws", "subnet", aws_subnet)
-        if not "sec_group" in self.settings["aws"] or not self.settings["aws"]["sec_group"]:
-            aws_sec_group = input("Please provide a Security Group with the SSH port open.\n ID: ")
-            if aws_sec_group:
-                self.set("aws", "sec_group", aws_sec_group)
-        if not "s3_bucket" in self.settings["aws"] or not self.settings["aws"]["s3_bucket"]:
-            s3_lambda_bucket = input("Please provide the AWS S3 Bucket name hosting the Lambda package. \n AWS Lambda S3 Bucket: ")
-            self.set("aws", "s3_bucket", s3_lambda_bucket)
-        if not "s3_key" in self.settings["aws"] or not self.settings["aws"]["s3_key"]:
-            s3_lambda_key = input("Please provide the AWS S3 folder path and file name excluding the bucket name. \n AWS Lambda S3 Folder path & filename: ")
-            self.set("aws", "s3_key", s3_lambda_key)
-        if not "name" in self.settings["lambda"] or not self.settings["lambda"]["name"]:
-            api_function_name = input("Please provide the AWS Lambda function name that we will update. \n AWS Lambda Function Name: ")
-            self.set("lambda", "name", api_function_name)
+    def check(self):
+        if not self.settings["git"]["private_key"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your Github private key.')
+            sys.exit(1)
+        if not self.settings["aws"]["private_key"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS private key.')
+            sys.exit(1)
+        if not self.settings["aws"]["subnet"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Subnet ID.')
+            sys.exit(1)
+        if not self.settings["aws"]["sec_group"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Security Group with SSH port open.')
+            sys.exit(1)
+        if not self.settings["aws"]["s3_bucket"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
+            sys.exit(1)
+        if not self.settings["aws"]["s3_key"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
+            sys.exit(1)
+        if not self.settings["lambda"]["name"]:
+            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Lambda info.')
+            sys.exit(1)
 
     def show(self):
         if not self.exists():
