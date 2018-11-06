@@ -3,7 +3,7 @@
 import time, paramiko
 from pathlib import Path
 
-class SSHConnect:
+class srvlConnect:
 
     def evoke_ssh(self, user_name, domain_name, remote_port=22):
         import subprocess

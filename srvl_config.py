@@ -3,10 +3,10 @@
 import ctypes, os, io, yaml
 from pathlib import Path
 
-class CloudConfig:
+class srvlConfig:
 
     def __init__(self):
-        self.file = str(Path.home())+"/.serve-R-less.yaml"
+        self.file = str(Path.home())+"/serve-R-less.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
         os.chdir(str(Path.home())+"/")
@@ -15,26 +15,19 @@ class CloudConfig:
 
     def check(self):
         if not self.settings["git"]["private_key"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your Github private key.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your Github private key.')
         if not self.settings["aws"]["private_key"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS private key.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS private key.')
         if not self.settings["aws"]["subnet"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Subnet ID.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS Subnet ID.')
         if not self.settings["aws"]["sec_group"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Security Group with SSH port open.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS Security Group with SSH port open.')
         if not self.settings["aws"]["s3_bucket"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
         if not self.settings["aws"]["s3_key"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
         if not self.settings["lambda"]["name"]:
-            sys.stderr.write('Please go to your ~/.serve-R-less.yaml file and update your AWS Lambda info.')
-            sys.exit(1)
+            print('Please go to your ~/serve-R-less.yaml file and update your AWS Lambda info.')
 
     def show(self):
         if not self.exists():

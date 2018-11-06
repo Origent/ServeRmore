@@ -5,22 +5,23 @@ import serveRless
 #2 - R model in storage
 
 #3 - create
-builder_instance = serveRless.Builder()
-#builder_instance.setup()
-#builder_instance.create("adc_test")
-#builder_instance.ssh()
-#builder_instance.terminate()
+vm = serveRless.serveRless()
+vm.setup()
+#vm.create("adc_test")
+
+#vm.ssh()
+#vm.terminate()
 
 #4 - update
-#builder_instance.update()
+#vm.update()
 
 #5 - package
-#builder_instance.package()
+#vm.package()
 
 #6 - deploy
-#builder_instance.deploy()
+#vm.deploy()
 
 #7 - test
-#builder_instance.test()
+#vm.test()
 
 #8 - terminate

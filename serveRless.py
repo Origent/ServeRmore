@@ -2,10 +2,10 @@
 
 import sys, time, srvl_config, srvl_connect
 
-class Builder:
+class serveRless:
 
     def __init__(self):
-        self.cc = srvl_config.CloudConfig()
+        self.cc = srvl_config.srvlConfig()
         self.cc.check()
         self.name_str = 'Lambda Builder'
 
@@ -94,11 +94,11 @@ class Builder:
                 return False
 
     def ssh(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.evoke_ssh('ec2-user',self.cc.settings["builder"]["domain_name"])
 
     def sftp(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.evoke_sftp('ec2-user',self.cc.settings["builder"]["domain_name"])
 
     def bootstrap(self):
@@ -107,7 +107,7 @@ class Builder:
         #self.init_pvenv()
 
     def upload_aws(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("pip install awscli --upgrade --user")
         cloud_connect.run_ssh("mkdir ~/.aws")
@@ -118,7 +118,7 @@ class Builder:
         cloud_connect.terminate_ssh()
 
     def init_builder(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y upgrade")
@@ -136,7 +136,7 @@ class Builder:
         cloud_connect.terminate_ssh()
 
     def init_pvenv(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && pip install 'rpy2<2.9.0'")
         cloud_connect.run_ssh("mkdir $HOME/packaging && cd $HOME/packaging")
@@ -166,13 +166,13 @@ class Builder:
         cloud_connect.terminate_ssh()
 
     def push_handler(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package_to_s3(self):
-        cloud_connect = srvl_connect.SSHConnect()
+        cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
         cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+
