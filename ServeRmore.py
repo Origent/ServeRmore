@@ -2,7 +2,7 @@
 
 import sys, time, srvl_config, srvl_connect
 
-class serveRless:
+class ServeRmore:
 
     def __init__(self):
         self.cc = srvl_config.srvlConfig()
@@ -167,6 +167,7 @@ class serveRless:
 
     def push_handler(self):
         cloud_connect = srvl_connect.srvlConnect()
+        # Create handler.py on the fly on the VM
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()

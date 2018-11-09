@@ -6,7 +6,7 @@ from pathlib import Path
 class srvlConfig:
 
     def __init__(self):
-        self.file = str(Path.home())+"/serve-R-less.yaml"
+        self.file = str(Path.home())+"/serveRmore.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
         os.chdir(str(Path.home())+"/")
@@ -15,19 +15,19 @@ class srvlConfig:
 
     def check(self):
         if not self.settings["git"]["private_key"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your Github private key.')
+            print('Please go to your ~/serveRmore.yaml file and update your Github private key.')
         if not self.settings["aws"]["private_key"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS private key.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS private key.')
         if not self.settings["aws"]["subnet"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS Subnet ID.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS Subnet ID.')
         if not self.settings["aws"]["sec_group"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS Security Group with SSH port open.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS Security Group with SSH port open.')
         if not self.settings["aws"]["s3_bucket"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
         if not self.settings["aws"]["s3_key"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS S3 Bucket and Key info.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
         if not self.settings["lambda"]["name"]:
-            print('Please go to your ~/serve-R-less.yaml file and update your AWS Lambda info.')
+            print('Please go to your ~/serveRmore.yaml file and update your AWS Lambda info.')
 
     def show(self):
         if not self.exists():
@@ -36,7 +36,7 @@ class srvlConfig:
             print(yaml.dump(self.load(), default_flow_style=False))
 
     def version(self):
-        print("Serve-R-less 0.0.1")
+        print("ServeRmore 0.0.1")
 
     def load_all(self):
         self.settings = self.load()
@@ -84,7 +84,7 @@ class srvlConfig:
     def reset(self):
         return yaml.load("""
         git:
-            repo: git@github.com:Origent/serve-R-less.git
+            repo: git@github.com:Origent/ServeRmore.git
             private_key: github.pem
         aws:
             s3_bucket:

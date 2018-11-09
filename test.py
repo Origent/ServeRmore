@@ -5,7 +5,7 @@ import serveRless
 #2 - R model in storage
 
 #3 - create
-vm = serveRless.serveRless()
+vm = ServeRmore.ServeRmore()
 vm.setup()
 #vm.create("adc_test")
 
