@@ -24,4 +24,4 @@ To Do:
 
 # Contributing
 
-Reach out to Andrew Conklin, aconklin@origent.com.
+Please reach out to Andrew Conklin for help getting started: aconklin@origent.com.
