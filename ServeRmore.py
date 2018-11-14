@@ -2,7 +2,7 @@
 
 import sys, time, srvl_config, srvl_connect
 
-class ServeRmore:
+class srm:
 
     def __init__(self):
         self.cc = srvl_config.srvlConfig()
@@ -165,14 +165,14 @@ class ServeRmore:
         cloud_connect.run_ssh("cp $HOME/packaging/bin/exec/R $HOME/packaging")
         cloud_connect.terminate_ssh()
 
-    def push_handler(self):
+    def update(self):
         cloud_connect = srvl_connect.srvlConnect()
         # Create handler.py on the fly on the VM
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
-    def package_to_s3(self):
+    def package(self):
         cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
@@ -180,7 +180,7 @@ class ServeRmore:
         self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"])
         cloud_connect.terminate_ssh()
 
-    def update_lambda(self):
+    def deploy(self):
         import boto3
         client = boto3.client('lambda')
         response = client.update_function_code(
