@@ -30,7 +30,7 @@
   Confirm the following:  
   * You have an IAM User account, Public Key, Secret Key, and Region.
   * Guide to install the AWS Command Line Interface ([Help](http://docs.aws.amazon.com/cli/latest/userguide/installing.html))
-  * Change your Ubuntu Bash window to allow QuickEdit ([Help](https://stackoverflow.com/questions/38832230/copy-paste-in-bash-on-ubuntu-on-windows)
+  * Change your Ubuntu Bash window to allow QuickEdit ([Help](https://stackoverflow.com/questions/38832230/copy-paste-in-bash-on-ubuntu-on-windows))
   ```
   cd ~
   apt-get -y update
