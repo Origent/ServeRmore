@@ -29,7 +29,6 @@
 2. Next, we want to configure our cloud hosting provider, AWS.  Begin by confirming you have the following information and then install the AWS Command Line Interface with the steps provided.  
   Confirm the following:  
   * You have an IAM User account, Public Key, Secret Key, and Region.
-  * Your IAM User account is added to the "Data Scientists" security group.
   * Guide to install the AWS Command Line Interface ([Help](http://docs.aws.amazon.com/cli/latest/userguide/installing.html))
   * Change your Ubuntu Bash window to allow QuickEdit ([Help](https://stackoverflow.com/questions/38832230/copy-paste-in-bash-on-ubuntu-on-windows)
   ```
@@ -61,7 +60,7 @@
 2. Next, we want to configure our cloud hosting provider, AWS.  Begin by confirming you have the following information and then install the AWS Command Line Interface with the steps provided.  
   Confirm the following:  
   * You have an IAM User account, Public Key, Secret Key, and Region.
-  * You have permissions to launch an AWS EC2 instance and AWS EMR cluster.
+  * You have permissions to launch an AWS EC2 instance.
   * Guide to install the AWS Command Line Interface ([Help](http://docs.aws.amazon.com/cli/latest/userguide/installing.html))
   ```
   cd ~
