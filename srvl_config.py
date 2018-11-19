@@ -11,7 +11,6 @@ class srvlConfig:
         self.pwd = os.getcwd()
         os.chdir(str(Path.home())+"/")
         self.load_all()
-        self.set("aws", "base_dir", os.getcwd())
 
     def check(self):
         str = "Please edit your ~/serveRmore.yaml file and add the following:\n"
@@ -37,8 +36,11 @@ class srvlConfig:
         if not self.settings["lambda"]["name"]:
             str = str + "Add AWS Lambda Function Name\n"
             print_msg += 1
-        if not self.settings["lambda"]["handler"]:
+        if not self.settings["lambda"]["handler_path"]:
             str = str + "Add AWS Lambda handler.py Path + Filename\n"
+            print_msg += 1
+        if not self.settings["builder"]["custom_r_package_file"]:
+            str = str + "Add Filename of your custom R package\n"
             print_msg += 1
         if print_msg > 0:
             print(str)
@@ -111,7 +113,6 @@ class srvlConfig:
             s3_bucket:
             s3_key:
             private_key: aws.pem
-            base_dir:
             subnet:
             sec_group:
         builder:
@@ -121,7 +122,8 @@ class srvlConfig:
             domain_name:
             public_ip:
             r_packages: ['survival', 'gbm', 'jsonlite']
+            custom_r_package_file:
         lambda:
             name:
-            handler:
+            handler_path:
         """)

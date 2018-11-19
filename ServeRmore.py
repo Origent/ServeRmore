@@ -123,6 +123,9 @@ class srm:
             "aws_secret_access_key = "+cloud_connect.get_aws_secret_key()+"\" > ~/.aws/credentials")
         for package in self.cc.settings["builder"]["r_packages"]:
             cloud_connect.run_ssh("echo \"install.packages('"+package+"', repos='http://cran.us.r-project.org')\">> ~/package_install.R")
+        if self.cc.settings["builder"]["custom_r_package_file"]:
+            cloud_connect.run_ssh("echo \"system('aws s3 cp s3://"+ self.settings["builder"]["s3_bucket"] +"/"+ self.settings["builder"]["s3_key"] +"/"+ self.settings["builder"]["custom_r_package_file"] + " ./" + self.settings["builder"]["custom_r_package_file"] + "')\">> ~/package_install.R")
+            cloud_connect.run_ssh("echo \"install.packages('"+self.settings["builder"]["custom_r_package_file"]+"', repos=NULL, type = 'source')\">> ~/package_install.R")
         cloud_connect.terminate_ssh()
         print("Running R Package Installs")
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
@@ -163,7 +166,7 @@ class srm:
     def update(self):
         cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
-        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
+        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package(self):
