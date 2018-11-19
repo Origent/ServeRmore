@@ -8,9 +8,6 @@ class srm:
         self.cc = srvl_config.srvlConfig()
         self.cc.check()
 
-    def setup(self):
-        self.cc.load()
-
     def create(self, name):
         import boto3
         prompt1_str = "New Lambda Builder ID: "

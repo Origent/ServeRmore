@@ -33,23 +33,17 @@ def main():
     elif sys.argv[1] == 'version':
         config=srvl_config.srvlConfig()
         config.version()
-    elif len(sys.argv) < 2:
-        vm = ServeRmore.srm()
-        vm.status()
-    elif sys.argv[1] == 'status':
-        vm = ServeRmore.srm()
-        vm.status()
     elif sys.argv[1] == 'create':
         vm = ServeRmore.srm()
-        vm.setup()
         vm.create("srm_builder")
     elif sys.argv[1] == 'terminate':
         vm = ServeRmore.srm()
-        vm.setup()
         vm.terminate()
+    elif sys.argv[1] == 'status':
+        vm = ServeRmore.srm()
+        vm.status()
     elif sys.argv[1] == 'update':
         vm = ServeRmore.srm()
-        vm.setup()
         vm.update()
     elif sys.argv[1] == 'package':
         vm = ServeRmore.srm()

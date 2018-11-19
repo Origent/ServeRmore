@@ -14,7 +14,7 @@ class srvlConfig:
         self.set("aws", "base_dir", os.getcwd())
 
     def check(self):
-        str = "Please go to your ~/serveRmore.yaml file and add the following:\n"
+        str = "Please edit your ~/serveRmore.yaml file and add the following:\n"
         print_msg = 0
         if not self.settings["git"]["private_key"]:
             str = str + "Add Github private key\n"
@@ -36,6 +36,9 @@ class srvlConfig:
             print_msg += 1
         if not self.settings["lambda"]["name"]:
             str = str + "Add AWS Lambda Function Name\n"
+            print_msg += 1
+        if not self.settings["lambda"]["handler"]:
+            str = str + "Add AWS Lambda handler.py Path + Filename\n"
             print_msg += 1
         if print_msg > 0:
             print(str)
