@@ -14,20 +14,31 @@ class srvlConfig:
         self.set("aws", "base_dir", os.getcwd())
 
     def check(self):
+        str = "Please go to your ~/serveRmore.yaml file and add the following:\n"
+        print_msg = 0
         if not self.settings["git"]["private_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your Github private key.')
+            str = str + "Add Github private key\n"
+            print_msg += 1
         if not self.settings["aws"]["private_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS private key.')
+            str = str + "Add AWS private key\n"
+            print_msg += 1
         if not self.settings["aws"]["subnet"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Subnet ID.')
+            str = str + "Add Subnet ID\n"
+            print_msg += 1
         if not self.settings["aws"]["sec_group"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Security Group with SSH port open.')
+            str = str + "Add AWS Security Group w/ SSH port open\n"
+            print_msg += 1
         if not self.settings["aws"]["s3_bucket"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
+            str = str + "Add AWS S3 Bucket Name\n"
+            print_msg += 1
         if not self.settings["aws"]["s3_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
+            str = str + "Add AWS S3 Bucket Key\n"
+            print_msg += 1
         if not self.settings["lambda"]["name"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Lambda info.')
+            str = str + "Add AWS Lambda Function Name\n"
+            print_msg += 1
+        if print_msg > 0:
+            print(str)
 
     def show(self):
         if not self.exists():
@@ -80,6 +91,13 @@ class srvlConfig:
             return True
         else:
             return False
+
+    def help(self):
+        s = """\nPlease use the following commands for AWS:
+    srm help | settings | version
+    srm create | update | package | deploy | test | terminate
+    srm status | ssh | sftp\n"""
+        print(s)
 
     def reset(self):
         return yaml.load("""

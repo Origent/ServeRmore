@@ -7,14 +7,12 @@ class srm:
     def __init__(self):
         self.cc = srvl_config.srvlConfig()
         self.cc.check()
-        self.name_str = 'Lambda Builder'
 
     def setup(self):
         self.cc.load()
 
     def create(self, name):
         import boto3
-        self.name_str = str(name) + ' ' + str(self.name_str)
         prompt1_str = "New Lambda Builder ID: "
         prompt2_str = "Lambda Builder already exists."
         if not self.cc.settings["builder"]["instance_id"]:
@@ -35,7 +33,7 @@ class srm:
                         'Tags': [
                             {
                                 'Key':'Name',
-                                'Value': str(self.name_str)
+                                'Value': str(name)
                             }
                         ]
                     }
@@ -104,7 +102,7 @@ class srm:
     def bootstrap(self):
         self.upload_aws()
         self.init_builder()
-        #self.init_pvenv()
+        self.init_pvenv()
 
     def upload_aws(self):
         cloud_connect = srvl_connect.srvlConnect()
@@ -167,7 +165,6 @@ class srm:
 
     def update(self):
         cloud_connect = srvl_connect.srvlConnect()
-        # Create handler.py on the fly on the VM
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
