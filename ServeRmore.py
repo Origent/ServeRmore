@@ -182,6 +182,6 @@ class srm:
         response = client.update_function_code(
             FunctionName=self.cc.settings["lambda"]["name"],
             S3Bucket=self.cc.settings["aws"]["s3_bucket"],
-            S3Key=self.cc.settings["aws"]["s3_key"],
+            S3Key=self.cc.settings["aws"]["s3_key"]+"/lambda.zip",
         )
         print(response)
