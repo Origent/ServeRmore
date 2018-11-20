@@ -121,7 +121,7 @@ class srm:
         cloud_connect.run_ssh("pip install --upgrade pip")
         cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
             "aws_secret_access_key = "+cloud_connect.get_aws_secret_key()+"\" > ~/.aws/credentials")
-        for package in self.cc.settings["builder"]["r_packages"]:
+        for package in self.cc.settings["builder"]["cran_r_package_names"]:
             cloud_connect.run_ssh("echo \"install.packages('"+package+"', repos='http://cran.us.r-project.org')\">> ~/package_install.R")
         if self.cc.settings["builder"]["custom_r_package_file"]:
             cloud_connect.run_ssh("echo \"system('aws s3 cp s3://"+ self.cc.settings["aws"]["s3_bucket"] +"/"+ self.cc.settings["aws"]["s3_key"] +"/"+ self.cc.settings["builder"]["custom_r_package_file"] + " ./" + self.cc.settings["builder"]["custom_r_package_file"] + "')\">> ~/package_install.R")
@@ -173,8 +173,7 @@ class srm:
         cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
-        cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+
-        self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"])
+        cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"]+"/lambda.zip")
         cloud_connect.terminate_ssh()
 
     def deploy(self):

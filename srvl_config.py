@@ -121,8 +121,8 @@ class srvlConfig:
             instance_id:
             domain_name:
             public_ip:
-            r_packages: ['survival', 'gbm', 'jsonlite']
             custom_r_package_file:
+            cran_r_package_names: ['survival', 'gbm', 'jsonlite']
         lambda:
             name:
             handler_path:
