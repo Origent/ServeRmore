@@ -118,6 +118,7 @@ class srm:
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y upgrade")
         cloud_connect.run_ssh("sudo yum -y install python27-devel python27-pip gcc gcc-c++ readline-devel libgfortran.x86_64 R.x86_64")
+        cloud_connect.run_ssh("sudo yum -y install openssl-devel libxml2-devel libcurl-devel")
         cloud_connect.run_ssh("pip install --upgrade pip")
         cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
             "aws_secret_access_key = "+cloud_connect.get_aws_secret_key()+"\" > ~/.aws/credentials")
@@ -158,6 +159,13 @@ class srm:
         cloud_connect.run_ssh("cp /lib64/libtinfo.so.5 $HOME/packaging/lib")
         cloud_connect.run_ssh("cp /usr/lib64/libicudata.so.50 $HOME/packaging/lib")
         cloud_connect.run_ssh("cp /usr/lib64/libstdc++.so.6 $HOME/packaging/lib")
+
+        # AWS S3 R Package
+        cloud_connect.run_ssh("cp /usr/lib64/libssl.so $HOME/packaging/lib")
+        cloud_connect.run_ssh("cp /usr/lib64/libcurl.so $HOME/packaging/lib")
+        cloud_connect.run_ssh("cp /usr/lib64/libxml2.so $HOME/packaging/lib")
+        cloud_connect.run_ssh("cp /usr/lib64/libnghttp2.so.14 $HOME/packaging/lib")
+        cloud_connect.run_ssh("cp /usr/lib64/libcrypto.so.10 $HOME/packaging/lib")
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib64/python2.7/dist-packages/* $HOME/packaging")
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib/python2.7/dist-packages/singledispatch* $HOME/packaging")
         cloud_connect.run_ssh("cp $HOME/packaging/bin/exec/R $HOME/packaging")
