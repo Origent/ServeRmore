@@ -9,40 +9,41 @@ class srvlConfig:
         self.file = str(Path.home())+"/serveRmore.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
+        self.print_msg = 0
         os.chdir(str(Path.home())+"/")
         self.load_all()
 
     def check(self):
         str = "Please edit your ~/serveRmore.yaml file and add the following:\n"
-        print_msg = 0
+        self.print_msg = 0
         if not self.settings["git"]["private_key"]:
             str = str + "Add Github private key\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["aws"]["private_key"]:
             str = str + "Add AWS private key\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["aws"]["subnet"]:
             str = str + "Add Subnet ID\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["aws"]["sec_group"]:
             str = str + "Add AWS Security Group w/ SSH port open\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["aws"]["s3_bucket"]:
             str = str + "Add AWS S3 Bucket Name\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["aws"]["s3_key"]:
             str = str + "Add AWS S3 Bucket Key\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["lambda"]["name"]:
             str = str + "Add AWS Lambda Function Name\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["lambda"]["handler_path"]:
             str = str + "Add AWS Lambda handler.py Path + Filename\n"
-            print_msg += 1
+            self.print_msg += 1
         if not self.settings["builder"]["custom_r_package_file"]:
             str = str + "Add Filename of your custom R package\n"
-            print_msg += 1
-        if print_msg > 0:
+            self.print_msg += 1
+        if self.print_msg > 0:
             print(str)
 
     def show(self):
