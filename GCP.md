@@ -1,4 +1,4 @@
-# LAMBDA Manual Configuration
+# Google Cloud Platform Functions Manual Configuration
 
 ## Assumptions
 
@@ -6,8 +6,8 @@
 
 ## Additional Setup
 
-  * Manually create the API Gateway
-  * Manually create initial Lambda function
+  *
+  *
 
 ## Steps
 

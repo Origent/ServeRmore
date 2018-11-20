@@ -18,7 +18,7 @@ import os
 if os.environ.get('LC_CTYPE', '') == 'UTF-8':
     os.environ['LC_CTYPE'] = 'en_US.UTF-8'
 
-import ServeRmore.srm
+import ServeRmore, srvl_config
 
 def main():
     if len(sys.argv) < 2:
@@ -33,39 +33,42 @@ def main():
     elif sys.argv[1] == 'version':
         config=srvl_config.srvlConfig()
         config.version()
-    elif len(sys.argv) < 2:
-        vm = ServeRmore.srm()
-        vm.status()
-    elif sys.argv[1] == 'status':
-        vm = ServeRmore.srm()
-        vm.status()
     elif sys.argv[1] == 'create':
         vm = ServeRmore.srm()
-        vm.setup()
-        vm.create("srm_builder")
+        if vm.cc.print_msg < 1:
+            vm.create("srm_builder")
     elif sys.argv[1] == 'terminate':
         vm = ServeRmore.srm()
-        vm.setup()
-        vm.terminate()
+        if vm.cc.print_msg < 1:
+            vm.terminate()
+    elif sys.argv[1] == 'status':
+        vm = ServeRmore.srm()
+        if vm.cc.print_msg < 1:
+            vm.status()
     elif sys.argv[1] == 'update':
         vm = ServeRmore.srm()
-        vm.setup()
-        vm.update()
+        if vm.cc.print_msg < 1:
+            vm.update()
     elif sys.argv[1] == 'package':
         vm = ServeRmore.srm()
-        vm.package()
+        if vm.cc.print_msg < 1:
+            vm.package()
     elif sys.argv[1] == 'deploy':
         vm = ServeRmore.srm()
-        vm.deploy()
+        if vm.cc.print_msg < 1:
+            vm.deploy()
     elif sys.argv[1] == 'test':
         vm = ServeRmore.srm()
-        vm.test()
+        if vm.cc.print_msg < 1:
+            vm.test()
     elif sys.argv[1] == 'ssh':
         vm = ServeRmore.srm()
-        vm.ssh()
+        if vm.cc.print_msg < 1:
+            vm.ssh()
     elif sys.argv[1] == 'sftp':
         vm = ServeRmore.srm()
-        vm.sftp()
+        if vm.cc.print_msg < 1:
+            vm.sftp()
     else:
         config=srvl_config.srvlConfig()
         config.help()

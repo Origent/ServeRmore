@@ -7,14 +7,9 @@ class srm:
     def __init__(self):
         self.cc = srvl_config.srvlConfig()
         self.cc.check()
-        self.name_str = 'Lambda Builder'
-
-    def setup(self):
-        self.cc.load()
 
     def create(self, name):
         import boto3
-        self.name_str = str(name) + ' ' + str(self.name_str)
         prompt1_str = "New Lambda Builder ID: "
         prompt2_str = "Lambda Builder already exists."
         if not self.cc.settings["builder"]["instance_id"]:
@@ -35,7 +30,7 @@ class srm:
                         'Tags': [
                             {
                                 'Key':'Name',
-                                'Value': str(self.name_str)
+                                'Value': str(name)
                             }
                         ]
                     }
@@ -104,7 +99,7 @@ class srm:
     def bootstrap(self):
         self.upload_aws()
         self.init_builder()
-        #self.init_pvenv()
+        self.init_pvenv()
 
     def upload_aws(self):
         cloud_connect = srvl_connect.srvlConnect()
@@ -126,8 +121,11 @@ class srm:
         cloud_connect.run_ssh("pip install --upgrade pip")
         cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
             "aws_secret_access_key = "+cloud_connect.get_aws_secret_key()+"\" > ~/.aws/credentials")
-        for package in self.cc.settings["builder"]["r_packages"]:
+        for package in self.cc.settings["builder"]["cran_r_package_names"]:
             cloud_connect.run_ssh("echo \"install.packages('"+package+"', repos='http://cran.us.r-project.org')\">> ~/package_install.R")
+        if self.cc.settings["builder"]["custom_r_package_file"]:
+            cloud_connect.run_ssh("echo \"system('aws s3 cp s3://"+ self.cc.settings["aws"]["s3_bucket"] +"/"+ self.cc.settings["aws"]["s3_key"] +"/"+ self.cc.settings["builder"]["custom_r_package_file"] + " ./" + self.cc.settings["builder"]["custom_r_package_file"] + "')\">> ~/package_install.R")
+            cloud_connect.run_ssh("echo \"install.packages('"+self.cc.settings["builder"]["custom_r_package_file"]+"', repos=NULL, type = 'source')\">> ~/package_install.R")
         cloud_connect.terminate_ssh()
         print("Running R Package Installs")
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
@@ -167,17 +165,15 @@ class srm:
 
     def update(self):
         cloud_connect = srvl_connect.srvlConnect()
-        # Create handler.py on the fly on the VM
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
-        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler"]+"/", "/home/ec2-user/packaging/", 'handler.py')
+        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package(self):
         cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
-        cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+
-        self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"])
+        cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"]+"/lambda.zip")
         cloud_connect.terminate_ssh()
 
     def deploy(self):
@@ -186,6 +182,6 @@ class srm:
         response = client.update_function_code(
             FunctionName=self.cc.settings["lambda"]["name"],
             S3Bucket=self.cc.settings["aws"]["s3_bucket"],
-            S3Key=self.cc.settings["aws"]["s3_key"],
+            S3Key=self.cc.settings["aws"]["s3_key"]+"/lambda.zip",
         )
         print(response)

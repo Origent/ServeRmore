@@ -9,25 +9,42 @@ class srvlConfig:
         self.file = str(Path.home())+"/serveRmore.yaml"
         self.settings = {}
         self.pwd = os.getcwd()
+        self.print_msg = 0
         os.chdir(str(Path.home())+"/")
         self.load_all()
-        self.set("aws", "base_dir", os.getcwd())
 
     def check(self):
+        str = "Please edit your ~/serveRmore.yaml file and add the following:\n"
+        self.print_msg = 0
         if not self.settings["git"]["private_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your Github private key.')
+            str = str + "Add Github private key\n"
+            self.print_msg += 1
         if not self.settings["aws"]["private_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS private key.')
+            str = str + "Add AWS private key\n"
+            self.print_msg += 1
         if not self.settings["aws"]["subnet"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Subnet ID.')
+            str = str + "Add Subnet ID\n"
+            self.print_msg += 1
         if not self.settings["aws"]["sec_group"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Security Group with SSH port open.')
+            str = str + "Add AWS Security Group w/ SSH port open\n"
+            self.print_msg += 1
         if not self.settings["aws"]["s3_bucket"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
+            str = str + "Add AWS S3 Bucket Name\n"
+            self.print_msg += 1
         if not self.settings["aws"]["s3_key"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS S3 Bucket and Key info.')
+            str = str + "Add AWS S3 Bucket Key\n"
+            self.print_msg += 1
         if not self.settings["lambda"]["name"]:
-            print('Please go to your ~/serveRmore.yaml file and update your AWS Lambda info.')
+            str = str + "Add AWS Lambda Function Name\n"
+            self.print_msg += 1
+        if not self.settings["lambda"]["handler_path"]:
+            str = str + "Add AWS Lambda handler.py Path + Filename\n"
+            self.print_msg += 1
+        if not self.settings["builder"]["custom_r_package_file"]:
+            str = str + "Add Filename of your custom R package\n"
+            self.print_msg += 1
+        if self.print_msg > 0:
+            print(str)
 
     def show(self):
         if not self.exists():
@@ -81,6 +98,13 @@ class srvlConfig:
         else:
             return False
 
+    def help(self):
+        s = """\nPlease use the following commands for AWS:
+    srm help | settings | version
+    srm create | update | package | deploy | test | terminate
+    srm status | ssh | sftp\n"""
+        print(s)
+
     def reset(self):
         return yaml.load("""
         git:
@@ -90,7 +114,6 @@ class srvlConfig:
             s3_bucket:
             s3_key:
             private_key: aws.pem
-            base_dir:
             subnet:
             sec_group:
         builder:
@@ -99,8 +122,9 @@ class srvlConfig:
             instance_id:
             domain_name:
             public_ip:
-            r_packages: ['survival', 'gbm', 'jsonlite']
+            custom_r_package_file:
+            cran_r_package_names: ['survival', 'gbm', 'jsonlite']
         lambda:
             name:
-            handler:
+            handler_path:
         """)
