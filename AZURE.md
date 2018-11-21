@@ -1,20 +1,3 @@
 # MS Azure Functions Manual Configuration
 
-## Assumptions
-
-  The ([LAPTOP.md Guide](LAPTOP.md)) has been completed.
-
-## Additional Setup
-
-  *
-  * 
-
-## Steps
-
-1.
-
-
-2.
-
-
-3.
+Not currently supported.  Want to help? See our guide for [CONTRIBUTING.md](CONTRIBUTING.md)

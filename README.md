@@ -20,22 +20,20 @@ Please refer to your cloud platform for additional information:
 * [MS Azure Functions](AZURE.md)
 * [Google Cloud Functions](GCP.md)
 
-After any manual cloud setup steps, you can then run the following commands.
+These commands are available for awareness.  
+```
+srm help
+srm version
+srm status
+```
 
-To create the packaging runtime environment and update the Handler function, package and storage, then deploy to Serverless, run these commands:
+To create the packaging runtime environment and update the Handler function, package everything into a zip and store it, then deploy the zip to Serverless, run these commands:
 ```
 srm create
 srm update
 srm package
 srm deploy
 srm terminate
-```
-
-Additionally, these commands are available for additional insight.
-```
-srm help
-srm version
-srm status
 ```
 
 ## Roadmap
@@ -46,6 +44,6 @@ To Do:
 * Create a generic handler.py
 * Practice updating RStudio code and redeploying to a Lambda Function
 
-# Contributing
+## Contributing
 
-Please reach out to Andrew Conklin for help getting started: aconklin@origent.com. [CONTRIBUTING.md](CONTRIBUTING.md)
+Please refer to our guide for more information. [CONTRIBUTING.md](CONTRIBUTING.md)

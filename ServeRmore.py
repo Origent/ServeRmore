@@ -160,12 +160,16 @@ class srm:
         cloud_connect.run_ssh("cp /usr/lib64/libicudata.so.50 $HOME/packaging/lib")
         cloud_connect.run_ssh("cp /usr/lib64/libstdc++.so.6 $HOME/packaging/lib")
 
-        # AWS S3 R Package
-        cloud_connect.run_ssh("cp /usr/lib64/libssl.so $HOME/packaging/lib")
-        cloud_connect.run_ssh("cp /usr/lib64/libcurl.so $HOME/packaging/lib")
-        cloud_connect.run_ssh("cp /usr/lib64/libxml2.so $HOME/packaging/lib")
-        cloud_connect.run_ssh("cp /usr/lib64/libnghttp2.so.14 $HOME/packaging/lib")
-        cloud_connect.run_ssh("cp /usr/lib64/libcrypto.so.10 $HOME/packaging/lib")
+        # Start AWS S3 R Package
+        # cloud_connect.run_ssh("cp /usr/lib64/libcurl.so.4.4.0 $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /usr/lib64/libssl3.so $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /usr/lib64/libssl.so.1.0.2k $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /usr/lib64/libxml2.so $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /usr/lib64/libnghttp2.so.14 $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /lib64/libcryptsetup.so.4.7.0 $HOME/packaging/lib")
+        # cloud_connect.run_ssh("cp /lib64/libcrypt-2.17.so $HOME/packaging/lib")
+        # End AWS S3 R Package
+
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib64/python2.7/dist-packages/* $HOME/packaging")
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib/python2.7/dist-packages/singledispatch* $HOME/packaging")
         cloud_connect.run_ssh("cp $HOME/packaging/bin/exec/R $HOME/packaging")
@@ -193,3 +197,9 @@ class srm:
             S3Key=self.cc.settings["aws"]["s3_key"]+"/lambda.zip",
         )
         print(response)
+
+    def test(self):
+        import subprocess
+        import sys
+        print("Running -api_test.py- if its in your current working directory.")
+        result = subprocess.call("python3 "+ self.cc.settings["lambda"]["handler_path"] + "/api_test.py",shell=True)
