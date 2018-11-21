@@ -11,7 +11,7 @@ setup(
     author_email='cloudhosting@origent.com',
     scripts=['bin/srm', 'README.md'],
     py_modules = ['ServeRmore', 'srvl_config', 'srvl_connect'],
-    install_requires=['paramiko', 'boto3', 'PyYAML'],
+    install_requires=['paramiko', 'boto3', 'PyYAML', 'requests'],
     python_requires='>=3',
     url='https://github.com/Origent/ServeRmore.git',
     license='Apache License 2.0',
