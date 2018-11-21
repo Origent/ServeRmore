@@ -8,7 +8,7 @@ Please refer to our [LAPTOP.md Guide](LAPTOP.md) for necessary manual configurat
 
 To install the latest package, run these two commands:
 ```
-aws s3 cp s3://origent-public-demo/survival-titanic/ServeRmore-0.0.1.tar.gz ServeRmore-0.0.1.tar.gz
+aws s3 cp s3://origent-public-demo/ServeRmore-0.0.1.tar.gz ServeRmore-0.0.1.tar.gz
 
 pip3 install ServeRmore-0.0.1.tar.gz
 ```
