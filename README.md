@@ -1,6 +1,7 @@
 # ServeRmore
 
-A package to improve fast and iterative workflow between RStudio and AWS Lambda Function hosting.
+A package to improve fast and iterative workflow between RStudio and AWS Lambda Function hosting.  
+Python Package Index Releases: https://pypi.org/project/serveRmore/
 
 ## Requirements
 
