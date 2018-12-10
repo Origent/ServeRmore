@@ -4,10 +4,19 @@ Please reach out to Andrew Conklin for help getting started: aconklin@origent.co
 
 ## Repackaging
 
+Please be sure to create a PyPi.org account and request access to deploy a package to our index repository.
+
+Install the deploy dependency:
 ```
-python3 setup.py sdist
-aws s3 cp dist/ServeRmore-0.0.1.tar.gz s3://origent-public-demo/survival-titanic/ServeRmore-0.0.1.tar.gz
+pip3 install --user --upgrade twine
 ```
+
+Build your package and upload it to PyPi:
+```
+python3 setup.py sdist bdist_wheel
+twine upload dist/*
+```
+
 ## Debugging
 
 If you're looking to add R packages inside the Lambda Runtime, you may have to add additional low level operating system libs. You can explore this after you have a working R Package, by doing the following:
