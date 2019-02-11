@@ -103,3 +103,9 @@
   cd ~/.ssh
   chmod go-rwx ~/.ssh/config
   ```
+   
+  Finally, be sure to add your global configurations are set by providing your name and your email account affiliated with Github.
+  ```
+  git config --global user.name
+  git config --global user.email
+  ```
