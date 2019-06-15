@@ -37,11 +37,25 @@ srm terminate
 
 ## Roadmap
 
-Our objective is to be able to provide fast iteration on R ML modeling to an API endpoint on AWS Lambda. In our next version, we plan to automate the creation of the handler.py file that is needed to start the instance of Lambda and provide the translation layer from HTTPS request, to Python Request, to R Request, and back again.
+* Introduce new commands that allow using existing community Lambda layers for R without using a Python virtual environment.  Leverage an R Runtime and R Recommended layers.
 
-To Do:
-* Create a generic handler.py
-* Practice updating RStudio code and redeploying to a Lambda Function
+https://github.com/bakdata/aws-lambda-r-runtime
+```
+# example 'create' command code:
+aws lambda create-function --function-name dx-hd-pred \
+    --zip-file fileb://lambda.zip --handler matrix.handler \
+    --runtime provided --timeout 60 --memory-size 3008 \
+    --layers arn:aws:lambda:us-east-1:131329294410:layer:r-runtime-3.5.3 \
+        arn:aws:lambda:us-east-1:131329294410:layer:r-recommended-3.5.3 \
+    --role <role-arn> --region us-east-1
+
+#Get latest layer version for runtime
+aws lambda list-layer-versions --max-items 1 --no-paginate --layer-name arn:aws:lambda:us-east-1:131329294410:layer:r-runtime-3_5_3 --query 'LayerVersions[0].LayerVersionArn' --output text
+
+#Get latest layer version for recommended
+aws lambda list-layer-versions --max-items 1 --no-paginate --layer-name arn:aws:lambda:us-east-1:131329294410:layer:r-recommended-3_5_3 --query 'LayerVersions[0].LayerVersionArn' --output text
+```
+
 
 ## Contributing
 
