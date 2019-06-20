@@ -28,4 +28,4 @@ It is recommended that you run a single informational srm command before proceed
 srm help
 ```
 
-2. Open ~/serveRmore.yaml file in your text editor.  These values will need to be filled out. 
+2. Open ~/serveRmore.yaml file in your text editor.  These values will need to be filled out.

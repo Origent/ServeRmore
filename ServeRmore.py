@@ -6,7 +6,77 @@ class srm:
 
     def __init__(self):
         self.cc = srvl_config.srvlConfig()
-        self.cc.check()
+
+    def lambda_init(self):
+        import boto3
+        my_session = boto3.session.Session()
+        my_region = my_session.region_name
+        client = boto3.client('lambda')
+        response = client.list_layer_versions(
+            LayerName='arn:aws:lambda:'+my_region+':131329294410:layer:r-runtime-'+self.cc.settings["lambda"]["r_version"].replace(".", "_"),
+            MaxItems=1
+        )
+        print(response["LayerVersions"][0]["LayerVersionArn"])
+        self.cc.set("lambda", "arn_runtime_layer", response["LayerVersions"][0]["LayerVersionArn"])
+        response = client.list_layer_versions(
+            LayerName='arn:aws:lambda:'+my_region+':131329294410:layer:r-recommended-'+self.cc.settings["lambda"]["r_version"].replace(".", "_"),
+            MaxItems=1
+        )
+        print(response["LayerVersions"][0]["LayerVersionArn"])
+        self.cc.set("lambda", "arn_recommended_layer", response["LayerVersions"][0]["LayerVersionArn"])
+
+    def lambda_list(self):
+        import boto3
+        client = boto3.client('lambda')
+        response = client.list_functions(
+            MaxItems=50
+        )
+        #aws lambda list-functions --query "Functions[*].FunctionName"
+        for res in response["Functions"]:
+            print(res["FunctionName"])
+
+    def lambda_create(self):
+        import boto3
+        client = boto3.client('lambda')
+        response = client.create_function(
+            FunctionName=self.cc.settings["lambda"]["name"],
+            Runtime='provided',
+            Role=self.cc.settings["lambda"]["arn_role"],
+            Handler='lambda.handler',
+            Code={
+                'S3Bucket': self.cc.settings["aws"]["s3_bucket"],
+                'S3Key': self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["lambda"]["zip_file_name"]
+            },
+            Timeout=60,
+            MemorySize=3008,
+            Layers=[
+                self.cc.settings["lambda"]["arn_runtime_layer"],
+                self.cc.settings["lambda"]["arn_recommended_layer"]
+            ]
+        )
+
+    def lambda_invoke(self):
+        import boto3
+        client = boto3.client('lambda')
+        response = client.invoke(
+            FunctionName=self.cc.settings["lambda"]["name"]
+        )
+
+    def lambda_update(self):
+        import boto3
+        client = boto3.client('lambda')
+        response = client.update_function_code(
+            FunctionName=self.cc.settings["lambda"]["name"],
+            S3Bucket=self.cc.settings["aws"]["s3_bucket"],
+            S3Key=self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["lambda"]["zip_file_name"]
+        )
+
+    def lambda_destroy(self):
+        import boto3
+        client = boto3.client('lambda')
+        response = client.delete_function(
+            FunctionName=self.cc.settings["lambda"]["name"]
+        )
 
     def create(self, name):
         import boto3
@@ -159,17 +229,6 @@ class srm:
         cloud_connect.run_ssh("cp /lib64/libtinfo.so.5 $HOME/packaging/lib")
         cloud_connect.run_ssh("cp /usr/lib64/libicudata.so.50 $HOME/packaging/lib")
         cloud_connect.run_ssh("cp /usr/lib64/libstdc++.so.6 $HOME/packaging/lib")
-
-        # Start AWS S3 R Package
-        # cloud_connect.run_ssh("cp /usr/lib64/libcurl.so.4.4.0 $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /usr/lib64/libssl3.so $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /usr/lib64/libssl.so.1.0.2k $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /usr/lib64/libxml2.so $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /usr/lib64/libnghttp2.so.14 $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /lib64/libcryptsetup.so.4.7.0 $HOME/packaging/lib")
-        # cloud_connect.run_ssh("cp /lib64/libcrypt-2.17.so $HOME/packaging/lib")
-        # End AWS S3 R Package
-
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib64/python2.7/dist-packages/* $HOME/packaging")
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && cp -r $VIRTUAL_ENV/lib/python2.7/dist-packages/singledispatch* $HOME/packaging")
         cloud_connect.run_ssh("cp $HOME/packaging/bin/exec/R $HOME/packaging")
@@ -178,7 +237,7 @@ class srm:
     def update(self):
         cloud_connect = srvl_connect.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
-        cloud_connect.upload_file_ssh(self.cc.settings["lambda"]["handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
+        cloud_connect.upload_file_ssh(self.cc.settings["builder"]["lambda_handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package(self):
@@ -192,7 +251,7 @@ class srm:
         import boto3
         client = boto3.client('lambda')
         response = client.update_function_code(
-            FunctionName=self.cc.settings["lambda"]["name"],
+            FunctionName=self.cc.settings["builder"]["lambda_name"],
             S3Bucket=self.cc.settings["aws"]["s3_bucket"],
             S3Key=self.cc.settings["aws"]["s3_key"]+"/lambda.zip",
         )
@@ -202,4 +261,4 @@ class srm:
         import subprocess
         import sys
         print("Running -api_test.py- if its in your current working directory.")
-        result = subprocess.call("python3 "+ self.cc.settings["lambda"]["handler_path"] + "/api_test.py",shell=True)
+        result = subprocess.call("python3 "+ self.cc.settings["builder"]["lambda_handler_path"] + "/api_test.py",shell=True)

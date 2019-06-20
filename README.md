@@ -26,6 +26,15 @@ srm version
 srm status
 ```
 
+To deploy your R code directly to Lambda, try out our new workflow here.
+```
+srm lambda init
+srm lambda create
+srm lambda update
+srm lambda invoke
+srm lambda destroy
+```
+
 To create the packaging runtime environment and update the Handler function, package everything into a zip and store it, then deploy the zip to Serverless, run these commands:
 ```
 srm create
@@ -38,24 +47,6 @@ srm terminate
 ## Roadmap
 
 * Introduce new commands that allow using existing community Lambda layers for R without using a Python virtual environment.  Leverage an R Runtime and R Recommended layers.
-
-https://github.com/bakdata/aws-lambda-r-runtime
-```
-# example 'create' command code:
-aws lambda create-function --function-name dx-hd-pred \
-    --zip-file fileb://lambda.zip --handler matrix.handler \
-    --runtime provided --timeout 60 --memory-size 3008 \
-    --layers arn:aws:lambda:us-east-1:131329294410:layer:r-runtime-3.5.3 \
-        arn:aws:lambda:us-east-1:131329294410:layer:r-recommended-3.5.3 \
-    --role <role-arn> --region us-east-1
-
-#Get latest layer version for runtime
-aws lambda list-layer-versions --max-items 1 --no-paginate --layer-name arn:aws:lambda:us-east-1:131329294410:layer:r-runtime-3_5_3 --query 'LayerVersions[0].LayerVersionArn' --output text
-
-#Get latest layer version for recommended
-aws lambda list-layer-versions --max-items 1 --no-paginate --layer-name arn:aws:lambda:us-east-1:131329294410:layer:r-recommended-3_5_3 --query 'LayerVersions[0].LayerVersionArn' --output text
-```
-
 
 ## Contributing
 
