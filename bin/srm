@@ -24,6 +24,28 @@ def main():
     if len(sys.argv) < 2:
         config=srvl_config.srvlConfig()
         config.help()
+    elif len(sys.argv) == 3:
+        if sys.argv[1] == 'lambda' and sys.argv[2] == "init":
+            func = ServeRmore.srm()
+            func.lambda_init()
+        elif sys.argv[1] == 'lambda' and sys.argv[2] == "list":
+            func = ServeRmore.srm()
+            func.lambda_list()
+        elif sys.argv[1] == 'lambda' and sys.argv[2] == "create":
+            func = ServeRmore.srm()
+            func.lambda_create()
+        elif sys.argv[1] == 'lambda' and sys.argv[2] == "update":
+            func = ServeRmore.srm()
+            func.lambda_update()
+        elif sys.argv[1] == 'lambda' and sys.argv[2] == "invoke":
+            func = ServeRmore.srm()
+            func.lambda_invoke()
+        elif sys.argv[1] == 'lambda' and sys.argv[2] == "destroy":
+            func = ServeRmore.srm()
+            func.lambda_destroy()
+        else:
+            config=srvl_config.srvlConfig()
+            config.help()
     elif sys.argv[1] == 'help':
         config=srvl_config.srvlConfig()
         config.help()

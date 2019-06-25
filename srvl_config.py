@@ -13,39 +13,6 @@ class srvlConfig:
         os.chdir(str(Path.home())+"/")
         self.load_all()
 
-    def check(self):
-        str = "Please edit your ~/serveRmore.yaml file and add the following:\n"
-        self.print_msg = 0
-        if not self.settings["git"]["private_key"]:
-            str = str + "Add Github private key\n"
-            self.print_msg += 1
-        if not self.settings["aws"]["private_key"]:
-            str = str + "Add AWS private key\n"
-            self.print_msg += 1
-        if not self.settings["aws"]["subnet"]:
-            str = str + "Add Subnet ID\n"
-            self.print_msg += 1
-        if not self.settings["aws"]["sec_group"]:
-            str = str + "Add AWS Security Group w/ SSH port open\n"
-            self.print_msg += 1
-        if not self.settings["aws"]["s3_bucket"]:
-            str = str + "Add AWS S3 Bucket Name\n"
-            self.print_msg += 1
-        if not self.settings["aws"]["s3_key"]:
-            str = str + "Add AWS S3 Bucket Key\n"
-            self.print_msg += 1
-        if not self.settings["lambda"]["name"]:
-            str = str + "Add AWS Lambda Function Name\n"
-            self.print_msg += 1
-        if not self.settings["lambda"]["handler_path"]:
-            str = str + "Add AWS Lambda handler.py Path + Filename\n"
-            self.print_msg += 1
-        if not self.settings["builder"]["custom_r_package_file"]:
-            str = str + "Add Filename of your custom R package\n"
-            self.print_msg += 1
-        if self.print_msg > 0:
-            print(str)
-
     def show(self):
         if not self.exists():
             return False
@@ -53,7 +20,7 @@ class srvlConfig:
             print(yaml.dump(self.load(), default_flow_style=False))
 
     def version(self):
-        print("ServeRmore 0.0.1")
+        print("ServeRmore 0.0.2")
 
     def load_all(self):
         self.settings = self.load()
@@ -100,16 +67,25 @@ class srvlConfig:
 
     def help(self):
         s = """\nPlease use the following commands for AWS:
-    srm help | settings | version
-    srm create | update | package | deploy | test | terminate
-    srm status | ssh | sftp\n"""
+
+    bash$: srm help | settings | version
+        - utility helpers
+
+    For the new Lambda Layers Workflow:
+    bash$: srm lambda init | list
+        - Set your runtime layers or list existing functions
+    bash$: srm lambda create | update | destroy
+        - Create your function, update it, or destroy it
+    bash$: srm lambda invoke
+        - Run your function from the command line
+
+    For the historical Lambda Package Builder VM Workflow:
+    bash$: srm create | update | package | deploy | test | terminate
+    bash$: srm status | ssh | sftp\n\n"""
         print(s)
 
     def reset(self):
         return yaml.load("""
-        git:
-            repo: git@github.com:Origent/ServeRmore.git
-            private_key: github.pem
         aws:
             s3_bucket:
             s3_key:
@@ -124,7 +100,13 @@ class srvlConfig:
             public_ip:
             custom_r_package_file:
             cran_r_package_names: ['survival', 'gbm', 'jsonlite']
+            lambda_handler_path:
+            lambda_name:
         lambda:
             name:
-            handler_path:
+            r_version: 3.5.3
+            arn_role:
+            arn_runtime_layer:
+            arn_recommended_layer:
+            zip_file_name: lambda.zip
         """)
