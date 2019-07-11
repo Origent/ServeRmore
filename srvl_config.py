@@ -53,7 +53,7 @@ class srvlConfig:
             with io.open(self.file, 'w', encoding='utf8') as outfile:
                 yaml.dump(self.settings, outfile, default_flow_style=False, allow_unicode=True)
         with open(self.file, 'r') as stream:
-            return yaml.load(stream)
+            return yaml.load(stream, Loader=yaml.FullLoader)
 
     def replace(self):
         if self.exists():
@@ -72,6 +72,7 @@ class srvlConfig:
         - utility helpers
 
     For the new Lambda Layers Workflow:
+
     bash$: srm lambda init | list
         - Set your runtime layers or list existing functions
     bash$: srm lambda create | update | destroy
@@ -80,6 +81,7 @@ class srvlConfig:
         - Run your function from the command line
 
     For the historical Lambda Package Builder VM Workflow:
+
     bash$: srm create | update | package | deploy | test | terminate
     bash$: srm status | ssh | sftp\n\n"""
         print(s)
@@ -89,10 +91,10 @@ class srvlConfig:
         aws:
             s3_bucket:
             s3_key:
+        builder:
             private_key: aws.pem
             subnet:
             sec_group:
-        builder:
             ami: ami-4fffc834
             instance_type: t2.medium
             instance_id:
@@ -107,6 +109,6 @@ class srvlConfig:
             r_version: 3.5.3
             arn_role:
             arn_runtime_layer:
-            arn_recommended_layer:
+            arn_custom_layer:
             zip_file_name: lambda.zip
         """)

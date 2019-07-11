@@ -18,12 +18,6 @@ class srm:
         )
         print(response["LayerVersions"][0]["LayerVersionArn"])
         self.cc.set("lambda", "arn_runtime_layer", response["LayerVersions"][0]["LayerVersionArn"])
-        response = client.list_layer_versions(
-            LayerName='arn:aws:lambda:'+my_region+':131329294410:layer:r-recommended-'+self.cc.settings["lambda"]["r_version"].replace(".", "_"),
-            MaxItems=1
-        )
-        print(response["LayerVersions"][0]["LayerVersionArn"])
-        self.cc.set("lambda", "arn_recommended_layer", response["LayerVersions"][0]["LayerVersionArn"])
 
     def lambda_list(self):
         import boto3
@@ -31,7 +25,6 @@ class srm:
         response = client.list_functions(
             MaxItems=50
         )
-        #aws lambda list-functions --query "Functions[*].FunctionName"
         for res in response["Functions"]:
             print(res["FunctionName"])
 
@@ -51,7 +44,7 @@ class srm:
             MemorySize=3008,
             Layers=[
                 self.cc.settings["lambda"]["arn_runtime_layer"],
-                self.cc.settings["lambda"]["arn_recommended_layer"]
+                self.cc.settings["lambda"]["arn_custom_layer"]
             ]
         )
 
@@ -86,11 +79,11 @@ class srm:
             ec2 = boto3.resource('ec2')
             instance = ec2.create_instances(
                 SecurityGroupIds=[
-                    str(self.cc.settings["aws"]["sec_group"]),
+                    str(self.cc.settings["builder"]["sec_group"]),
                 ],
-                SubnetId=str(self.cc.settings["aws"]["subnet"]),
+                SubnetId=str(self.cc.settings["builder"]["subnet"]),
                 ImageId=str(self.cc.settings["builder"]["ami"]),
-                KeyName=str(self.cc.settings["aws"]["private_key"].replace('.pem', '')),
+                KeyName=str(self.cc.settings["builder"]["private_key"].replace('.pem', '')),
                 MinCount=1,
                 MaxCount=1,
                 InstanceType=str(self.cc.settings["builder"]["instance_type"]),
@@ -173,7 +166,7 @@ class srm:
 
     def upload_aws(self):
         cloud_connect = srvl_connect.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("pip install awscli --upgrade --user")
         cloud_connect.run_ssh("mkdir ~/.aws")
         cloud_connect.run_ssh("echo \"[default]\naws_access_key_id = "+cloud_connect.get_aws_access_key()+"\n"+
@@ -184,7 +177,7 @@ class srm:
 
     def init_builder(self):
         cloud_connect = srvl_connect.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y upgrade")
         cloud_connect.run_ssh("sudo yum -y install python27-devel python27-pip gcc gcc-c++ readline-devel libgfortran.x86_64 R.x86_64")
@@ -199,14 +192,14 @@ class srm:
             cloud_connect.run_ssh("echo \"install.packages('"+self.cc.settings["builder"]["custom_r_package_file"]+"', repos=NULL, type = 'source')\">> ~/package_install.R")
         cloud_connect.terminate_ssh()
         print("Running R Package Installs")
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo Rscript package_install.R")
         print("Finished R Package Installs")
         cloud_connect.terminate_ssh()
 
     def init_pvenv(self):
         cloud_connect = srvl_connect.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("virtualenv $HOME/env && source $HOME/env/bin/activate && pip install 'rpy2<2.9.0'")
         cloud_connect.run_ssh("mkdir $HOME/packaging && cd $HOME/packaging")
         cloud_connect.run_ssh("sudo rm /usr/lib64/R/lib/libRrefblas.so")
@@ -236,13 +229,13 @@ class srm:
 
     def update(self):
         cloud_connect = srvl_connect.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.upload_file_ssh(self.cc.settings["builder"]["lambda_handler_path"]+"/", "/home/ec2-user/packaging/", 'handler.py')
         cloud_connect.terminate_ssh()
 
     def package(self):
         cloud_connect = srvl_connect.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["builder"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("cd $HOME/packaging/ && zip -r9 $HOME/lambda.zip *")
         cloud_connect.run_ssh("aws s3 cp $HOME/lambda.zip s3://"+self.cc.settings["aws"]["s3_bucket"]+"/"+self.cc.settings["aws"]["s3_key"]+"/lambda.zip")
         cloud_connect.terminate_ssh()
