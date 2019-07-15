@@ -2,9 +2,7 @@
 
 ## Prerequisites
 
-Before this utility can be used, there are a number of assumptions made about your AWS environment.  
-
-If you have a master account or your IAM account is provided full admin permissions, you can skip over the permissions section.
+Before this utility can be used, there are a number of assumptions made about your AWS environment. If you have a master account or your IAM account is provided full admin permissions, you can skip over the permissions section.
 
 Permissions:
   * Can create and terminate EC2 instances
@@ -14,9 +12,6 @@ Permissions:
 
 Architecture:
   * Create your API Gateway through the AWS console
-  * Create a Lambda Function through the AWS console
-  * Connect your Function to your API.
-
 
 ## Steps
 

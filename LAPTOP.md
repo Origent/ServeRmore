@@ -1,9 +1,9 @@
 # Laptop Manual Configuration
 
-## Assumptions
+## Assumption
 
-  * 1: We will be using Github for source control.
-  * 2: We will be using Amazon Web Services for our cloud provider.  You have the main account or an account with admin access.
+  * You have an AWS IAM or Master account with Command Line access key and secret key.
+  * You have a Windows or MacBook.
 
 ## Standard Technical Configuration
 
@@ -36,8 +36,8 @@
   apt-get -y update
   apt-get -y install python3-pip
   apt-get -y install awscli
-  pip3 install --upgrade pip
-  pip3 install awscli --upgrade --user
+  pip install --upgrade pip
+  pip install awscli --upgrade --user
   aws configure
   ```
   * Complete the questions with our region and your IAM account information.
@@ -76,17 +76,14 @@
 
 ## For All
 
-3. Setup your SSH keys for AWS EC2 and Github.
-
-  Please follow Github instructions to setup your private key. Specifically, the section titled "Generating a new SSH key". ([Instructions](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/))
+3. Setup your SSH key for AWS EC2.
 
   Please follow AWS instructions to setup your private key. Specifically, the section titled "Creating a Key Pair Using Amazon EC2".
   ([Instructions](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair))
 
-  We will assume moving forward that your Github key will be named "github.pem" and your AWS key will be named "aws.pem".  Place the keys inside of your ~/.ssh folder.  Change the permissions so SSH doesn't complain and prevent action.
+  We will assume moving forward that your AWS key will be named "aws.pem".  Place the keys inside of your ~/.ssh folder.  Change the permissions so SSH doesn't complain and prevent action.
   ```
   cd ~/.ssh
-  chmod go-rwx ~/.ssh/github.pem
   chmod go-rwx ~/.ssh/aws.pem
   ```
 
@@ -94,7 +91,6 @@
 
   '~/.ssh/config':
   ```
-  IdentityFile ~/.ssh/github.pem
   IdentityFile ~/.ssh/aws.pem
   ```
 
@@ -102,10 +98,4 @@
   ```
   cd ~/.ssh
   chmod go-rwx ~/.ssh/config
-  ```
-   
-  Finally, be sure to add your global configurations are set by providing your name and your email account affiliated with Github.
-  ```
-  git config --global user.name
-  git config --global user.email
   ```
