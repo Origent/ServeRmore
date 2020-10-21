@@ -20,7 +20,7 @@ class srvlConfig:
             print(yaml.dump(self.load(), default_flow_style=False))
 
     def version(self):
-        print("ServeRmore 0.0.2")
+        print("ServeRmore 0.0.3")
 
     def load_all(self):
         self.settings = self.load()
@@ -70,20 +70,12 @@ class srvlConfig:
 
     bash$: srm help | settings | version
         - utility helpers
-
-    For the new Lambda Layers Workflow:
-
     bash$: srm lambda init | list
         - Set your runtime layers or list existing functions
     bash$: srm lambda create | update | destroy
         - Create your function, update it, or destroy it
     bash$: srm lambda invoke
-        - Run your function from the command line
-
-    For the historical Lambda Package Builder VM Workflow:
-
-    bash$: srm create | update | package | deploy | test | terminate
-    bash$: srm status | ssh | sftp\n\n"""
+        - Run your function from the command line\n\n"""
         print(s)
 
     def reset(self):
@@ -91,19 +83,6 @@ class srvlConfig:
         aws:
             s3_bucket:
             s3_key:
-        builder:
-            private_key: aws.pem
-            subnet:
-            sec_group:
-            ami: ami-4fffc834
-            instance_type: t2.medium
-            instance_id:
-            domain_name:
-            public_ip:
-            custom_r_package_file:
-            cran_r_package_names: ['survival', 'gbm', 'jsonlite']
-            lambda_handler_path:
-            lambda_name:
         lambda:
             name:
             r_version: 3.5.3

@@ -55,42 +55,6 @@ def main():
     elif sys.argv[1] == 'version':
         config=srvl_config.srvlConfig()
         config.version()
-    elif sys.argv[1] == 'create':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.create("srm_builder")
-    elif sys.argv[1] == 'terminate':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.terminate()
-    elif sys.argv[1] == 'status':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.status()
-    elif sys.argv[1] == 'update':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.update()
-    elif sys.argv[1] == 'package':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.package()
-    elif sys.argv[1] == 'deploy':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.deploy()
-    elif sys.argv[1] == 'test':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.test()
-    elif sys.argv[1] == 'ssh':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.ssh()
-    elif sys.argv[1] == 'sftp':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.sftp()
     else:
         config=srvl_config.srvlConfig()
         config.help()
