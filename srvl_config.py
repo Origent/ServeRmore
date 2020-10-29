@@ -83,6 +83,11 @@ class srvlConfig:
         aws:
             s3_bucket:
             s3_key:
+            default_security_group: 
+            mount_efs: 
+            private_key: 
+            ssh_security_group: 
+            subnet: 
         lambda:
             name:
             r_version: 3.5.3
@@ -90,4 +95,15 @@ class srvlConfig:
             arn_runtime_layer:
             arn_custom_layer:
             zip_file_name: lambda.zip
+        rs: 
+            ami: 
+            cran_packages: 
+            domain_name:
+            ec2_mesgs: 
+            ec2_types:
+            instance_id: 
+            instance_type: 
+            version: 3.5.3
+        git: 
+            private_key: github.pem
         """)
