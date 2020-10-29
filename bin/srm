@@ -43,9 +43,42 @@ def main():
         elif sys.argv[1] == 'lambda' and sys.argv[2] == "destroy":
             func = ServeRmore.srm()
             func.lambda_destroy()
+        elif sys.argv[1] == 'create':
+            vm = ServeRmore.srm()
+            vm.create(sys.argv[2])
         else:
             config=srvl_config.srvlConfig()
             config.help()
+    elif sys.argv[1] == 'status':
+        vm = ServeRmore.srm()
+        vm.status()
+    elif sys.argv[1] == 'cpu': 
+        vm = ServeRmore.srm()
+        vm.cpu()
+    elif sys.argv[1] == 'change':
+        vm = ServeRmore.srm()
+        vm.change()
+    elif sys.argv[1] == 'start':
+        vm = ServeRmore.srm()
+        vm.start()
+    elif sys.argv[1] == 'stop':
+        vm = ServeRmore.srm()
+        vm.stop()
+    elif sys.argv[1] == 'terminate':
+        vm = ServeRmore.srm()
+        vm.terminate()
+    elif sys.argv[1] == 'ssh':
+        vm = ServeRmore.srm()
+        vm.ssh()
+    elif sys.argv[1] == 'tunnel':
+        vm = ServeRmore.srm()
+        vm.tunnel()
+    elif sys.argv[1] == 'bootstrap':
+        vm = ServeRmore.srm()
+        vm.boostrap()
+    elif sys.argv[1] == 'vm_setup':
+        vm = ServeRmore.srm()
+        vm.vm_setup()
     elif sys.argv[1] == 'help':
         config=srvl_config.srvlConfig()
         config.help()
