@@ -1,8 +1,13 @@
 # Contributing
 
-Please reach out to Andrew Conklin for help getting started: aconklin@origent.com.
+Please reach out to Andrew Conklin for help getting started: https://github.com/adconk
 
-## Repackaging
+Use the following command to rebuild the package and reinstall it locally for development and unit testing.  Verify the "VERSION.py" file is set the latest new version number that WILL BE published.  
+```
+python3 package.py
+```
+
+## Releasing
 
 Please be sure to create a PyPi.org account and request access to deploy a package to our index repository.
 
@@ -19,14 +24,4 @@ twine upload dist/*
 
 ## Debugging
 
-If you're looking to add R packages inside the Lambda Runtime, you may have to add additional low level operating system libs. You can explore this after you have a working R Package, by doing the following:
-
-1. Create a new SRM VM.
-2. Run the following commands:
-
-```
-virtualenv ~/env && source ~/env/bin/activate
-ldd /usr/lib64/R/bin/exec/R
-```
-
-This will tell you the required libs to run R.  It does not indicate whats required of additional packages, but this should give you a start.
+tbd
