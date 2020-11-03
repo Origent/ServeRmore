@@ -1,6 +1,7 @@
 #!python3
 # -*- coding: utf-8 -*-
 
+import VERSION
 from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
@@ -8,14 +9,14 @@ with open("README.md", "r") as fh:
 
 setup(
     name='serveRmore',
-    version='0.0.3',
+    version=VERSION.VERSION,
     description='Serve R more on Serverless.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Origent Data Sciences',
     author_email='cloudhosting@origent.com',
     scripts=['bin/srm', 'README.md'],
-    py_modules = ['ServeRmore', 'srvl_config', 'srvl_connect'],
+    py_modules = ['ServeRmore', 'srvl_config', 'VERSION'],
     install_requires=['paramiko', 'boto3', 'PyYAML', 'requests'],
     python_requires='>=3',
     url='https://github.com/Origent/ServeRmore.git',
