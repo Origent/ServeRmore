@@ -18,7 +18,7 @@ chmod u+rwx -R r-runtime/*.sh
 chmod u+rwx -R r-gbm/*.sh
 ```
 
-2. Double check several scripts to ensure they are correct for R v4.x or a newer version you might be working with.  Namely, the Dockerfile "ARG VERSION=x.x.x" variable and the r/compile.sh script with the wget line.  the URL in the wget line specifies R-3, for 3.x.x versions of base R, but should say R-4 for 4.x.x versions of base R.
+2. Double check several scripts to ensure they are correct for R v4.x or a newer version you might be working with.  Namely, the Dockerfile "ARG VERSION=x.x.x" variable and the 'wget' line, along with the r/compile.sh script 'wget' line.  the URL in the wget line specifies R-3, for 3.x.x versions of base R, but should say R-4 for 4.x.x versions of base R.
 
 3. We will run the build script for the R base, R layer, and GBM layer. To build the layers yourself, you need to first build R from source. We provide a Docker image which uses the great [docker-lambda](https://github.com/lambci/docker-lambda) project. You can build R, R runtime layer, and R gbm layer all at once.  Just do the following with your version number and everything should be build properly.
 ```
@@ -32,7 +32,7 @@ If you plan to publish the runtime and gbm layers, you need to have a recent ver
 ./deploy.sh 4.0.2
 ```
 
-### r-runtime
+### r-runtime layer
 
 The r-runtime base layer has the following packages installed.
 
@@ -43,7 +43,7 @@ R,
 [logging](https://cran.r-project.org/package=logging),
 [yaml](https://cran.r-project.org/package=yaml)
 
-### r-gbm
+### r-gbm layer
 
 The r-gbm base layer has the following packages installed.
 
@@ -53,13 +53,24 @@ The r-gbm base layer has the following packages installed.
 [lattice](https://cran.r-project.org/package=lattice)
 [gbm](https://cran.r-project.org/package=gbm)
 
-### Debugging
-
-In order to make the runtime log debugging messages, you can set the environment variable `LOGLEVEL` to `DEBUG`.
-
 ## Limitations
 
 AWS Lambda is limited to running with 3GB RAM and must finish within 15 minutes. It is therefore not feasible to execute long running R scripts with this runtime. Furthermore, only the `/tmp/` directory is writeable on AWS Lambda. This must be considered when writing to the local disk.
+
+## Creating your own Layer
+
+If you decide to create your own layer, here's a few things to think about and a few steps to help you get started.
+
+Concepting:
+  1. Keep in mind the limits in how many layers a Lambda Function can have. I believe this remains a modest number.
+  2. Keep in mind the Lambda Layer zip package size limits.  It is extremely unlikely to be able to package up the entire Tidyverse as a layer, for example.  This could change as the AWS Lambda Service changes its requirements.  
+  3. Keep in mind, the more you add, the slower the Function performance will be come, as you'll be spending a lot more time starting up the environment to run the function code.  
+  4. Precision is important.  Unlike an R&D or exploratory programming environment, each decision has an impact on functionality, performance, and quality.
+
+Building:
+  1. The r-gbm directory is the best example of a custom layer that assumes an equivalent R base is provided in a separate layer.
+  2. Copy the directory under a new name, then find the two places where R packages are installed.  Swap out the package names for the packages you want in your new layer.
+  3. Build the layer, publish it in your AWS Lambda console, and then publish a Function that depends on it, to test it out.  Repeat the process until you've proven it works successfully.  
 
 ### Compiling on EC2 (TBD)
 
