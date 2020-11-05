@@ -66,7 +66,7 @@ v0.1.1
 
 ## Changelog
 
-v0.1.0 - Removed original and deprecated deployment steps for custom Lambda packages that used r2py, Python 2, and R 3.4.2. Added new lambda layer builder VM commands.  Also migrated scripts for R, R-runtime, and R-gbm layers into subfolder.
+v0.1.0 - Removed original and deprecated deployment steps for custom Lambda packages that used r2py, Python 2, and R 3.4.2. Added new lambda layer builder VM commands.  Also migrated scripts for R, R-runtime, and R-gbm layers into subfolder for local Macbook environment.
 
 v0.0.2 - Introduces running R directly on Lambda via AWS' new custom layers feature, big thanks to [@bakdata](https://github.com/bakdata).
 * Several new commands for initiating the R runtime version, creating new functions, updating them, and destroying them.
