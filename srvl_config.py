@@ -20,7 +20,7 @@ class srvlConfig:
             print(yaml.dump(self.load(), default_flow_style=False))
 
     def version(self):
-        print("ServeRmore "+VERSION.VERSION)
+        print("ServeRmore "+VERSION.srm_VERSION)
 
     def load_all(self):
         self.settings = self.load()

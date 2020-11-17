@@ -12,7 +12,7 @@ def package_test():
     import sys
     COMMAND="pip uninstall serveRmore -y"
     result = subprocess.call(COMMAND,shell=True)
-    COMMAND="pip install dist/serveRmore-"+VERSION.VERSION+".tar.gz"
+    COMMAND="pip install dist/serveRmore-"+VERSION.srm_VERSION+".tar.gz"
     result = subprocess.call(COMMAND,shell=True)
     COMMAND="srm settings"
     result = subprocess.call(COMMAND,shell=True)

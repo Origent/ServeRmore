@@ -58,15 +58,15 @@ def main():
     elif sys.argv[1] == 'status':
         vm = ServeRmore.srm()
         vm.status()
-    elif sys.argv[1] == 'cpu':
-        vm = ServeRmore.srm()
-        vm.cpu()
     elif sys.argv[1] == 'terminate':
         vm = ServeRmore.srm()
         vm.terminate()
     elif sys.argv[1] == 'ssh':
         vm = ServeRmore.srm()
         vm.ssh()
+    elif sys.argv[1] == 'cpu':
+        vm = ServeRmore.srm()
+        vm.cpu()
     else:
         config=srvl_config.srvlConfig()
         config.help()
