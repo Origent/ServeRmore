@@ -76,12 +76,8 @@ class srvlConfig:
         s = """\nPlease use the following commands for AWS:
     bash$: srm help | settings | version
         - utility helpers
-    bash$: srm lambda init | list
-        - Set your runtime layers or list existing functions
-    bash$: srm lambda create | update | destroy
-        - Create your function, update it, or destroy it
-    bash$: srm lambda invoke
-        - Run your function from the command line
+    bash$: srm lambda list | create | update | destroy
+        - List functions, create your function, update it, or destroy it
     bash$: srm create | ssh | cpu | status | destroy
         - Create and interact with your layer builder VM\n\n"""
         print(s)

@@ -163,8 +163,6 @@ class srm:
 
     def bootstrap(self):
         self.vm_setup()
-        self.init_container()
-        self.setup_container()
 
     def vm_setup(self):
         from pathlib import Path
@@ -193,29 +191,3 @@ class srm:
         cloud_connect.run_ssh("sudo service docker start")
         cloud_connect.terminate_ssh()
         print("Docker Service restarted...")
-
-    def init_container(self):
-        import subprocess
-        import sys
-        from pathlib import Path
-        cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
-        cloud_connect.run_ssh("docker run --name lambda -d -e DOCKER_LAMBDA_STAY_OPEN=1 -p 9001:9001 -v \"$PWD\":/var/task:ro,delegated lambci/lambda:provided.al2")
-        time.sleep(10)
-        cloud_connect.terminate_ssh()
-
-    def setup_container(self):
-        print("Copying SSH dependencies in Docker Lambda Layer Build container...")
-        cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
-        print("Copying AWS dependencies in Docker Lambda Layer Build container...")
-        #cloud_connect.run_ssh("docker exec rstudio mkdir -p /home/rstudio/.aws")
-        #cloud_connect.run_ssh("docker cp /home/ec2-user/.aws/. lambda:/home/sbx_user1051/.aws/")
-        #cloud_connect.run_ssh("docker exec lambda sudo chown -R sbx_user1051 /home/rstudio/.aws/")
-        #cloud_connect.run_ssh("docker exec lambda sudo ln -sf /var/task/.local/bin/aws /usr/bin/aws")
-        #cloud_connect.run_ssh("docker exec rstudio sudo apt-get -y update")
-        #cloud_connect.run_ssh("docker exec rstudio sudo apt-get -y install python3-pip fuse unixodbc unixodbc-dev odbc-postgresql postgresql postgresql-contrib libssl-dev libsasl2-dev")
-        #cloud_connect.run_ssh("docker exec lambda pip3 install awscli --upgrade --user")
-        #cloud_connect.run_ssh("docker exec lambda sudo python3 -m pip install serveRmore")
-        cloud_connect.terminate_ssh()
-        print("Completed Docker Lambda Layer Build container setup.")

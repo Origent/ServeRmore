@@ -1,15 +1,14 @@
 FROM lambci/lambda:build-provided.al2
 
-RUN yum install -q -y wget \
-    readline-devel curl-devel \
-    xorg-x11-server-devel libX11-devel libXt-devel \
-    gcc-c++ gcc-gfortran \
-    zlib-devel libbz2-devel bzip2 bzip2-libs
+RUN amazon-linux-extras enable R4 && \
+    yum clean metadata && \
+    yum install -q -y R wget readline-devel curl-devel xorg-x11-server-devel libXt-devel
 
-ARG VERSION=4.0.3
+ARG VERSION=4.0.2
 ARG R_DIR=/opt/R/
 
-RUN wget -q https://cran.r-project.org/src/base/R-4/R-${VERSION}.tar.gz && \
+RUN cd ~ && \
+  wget -q https://cran.r-project.org/src/base/R-4/R-${VERSION}.tar.gz && \
   mkdir ${R_DIR} && \
   tar -xf R-${VERSION}.tar.gz && \
   mv R-${VERSION}/* ${R_DIR} && \
@@ -19,7 +18,7 @@ WORKDIR ${R_DIR}
 
 RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/opt/ --enable-R-shlib && \
    make && \
-   cp /usr/lib64/libgfortran.so.3 lib/ && \
+   cp /usr/lib64/libgfortran.so.4 lib/ && \
    cp /usr/lib64/libgomp.so.1 lib/ && \
    cp /usr/lib64/libquadmath.so.0 lib/ && \
    cp /usr/lib64/libstdc++.so.6 lib/

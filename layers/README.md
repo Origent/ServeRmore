@@ -1,5 +1,10 @@
 ## Custom R Runtime Layers
 
+ToDo:
+
+
+* Add step to pull Repo into VM
+
 ### Dependencies
 
 * Install Docker Desktop on Mac or use an EC2 VM with the docker service installed.
@@ -9,7 +14,20 @@
 
 You can build two layers from scratch.  Please take the following steps to complete.
 
-1. We want to make sure that shell/terminal scripts are executable.
+1. Use the "srm" utility to create a new VM.  Then login to it.
+```
+srm create
+srm ssh
+```
+
+2. Pull down the ServeRmore repo locally.
+```
+git clone git@github.com/Origent/ServeRmore.git
+git fetch origin
+git pull origin srm_0.1.0
+```
+
+3. We want to make sure that shell/terminal scripts are executable.
 ```
 cd ServeRmore/layers
 chmod u+rwx -R *.sh
@@ -18,19 +36,28 @@ chmod u+rwx -R r-runtime/*.sh
 chmod u+rwx -R r-gbm/*.sh
 ```
 
-2. Double check several scripts to ensure they are correct for R v4.x or a newer version you might be working with.  Namely, the Dockerfile "ARG VERSION=x.x.x" variable and the 'wget' line, along with the r/compile.sh script 'wget' line.  the URL in the wget line specifies R-3, for 3.x.x versions of base R, but should say R-4 for 4.x.x versions of base R.
+4. Double check several scripts to ensure they are correct for R v4.x or a newer version you might be working with.  Namely, the Dockerfile "ARG VERSION=x.x.x" variable and the 'wget' line, along with the r/compile.sh script 'wget' line.  They should say R-4 for 4.x.x versions of base R, as we are no longer working with R 3.x.x.
 
-3. We will run the build script for the R base, R layer, and GBM layer. To build the layers yourself, you need to first build R from source. We provide a Docker image which uses the great [docker-lambda](https://github.com/lambci/docker-lambda) project. You can build R, R runtime layer, and R gbm layer all at once.  Just do the following with your version number and everything should be build properly.
+5. We will run the build script for the R base, R layer, and GBM layer. To build the layers yourself, you need to first build R from source. We provide a Docker image which uses the great [docker-lambda](https://github.com/lambci/docker-lambda) project. You can build R, R runtime layer, and R gbm layer all at once.  Just do the following with your version number and everything should be build properly.
 ```
 ./build.sh 4.0.2
 ```
 
-4. We then run the deploy script for the R layer and GBM layer. This publishes to your AWS account if you have previously followed the LAPTOP setup guide and you have an active AWS account.
+6. We then run the deploy script for the R layer and GBM layer. This publishes to your AWS account if you have previously followed the LAPTOP setup guide and you have an active AWS account.
 
 If you plan to publish the runtime and gbm layers, you need to have a recent version of aws cli (>=1.16). When you run the deploy script with your version number, it creates two lambda layers named `r-<layer>-<version>` in your AWS account.
 ```
 ./deploy.sh 4.0.2
 ```
+
+### Debugging
+
+If there are challenges with the layer build, the following command can be run in order to interact with the environment inside the docker service used to build the layer.
+```
+docker run -it lambci/lambda:build-provided.al2 bash
+```
+
+Once inside the Terminal of the Docker service, the individual commands listed in Dockerfile can be run.
 
 ### r-runtime layer
 
@@ -72,7 +99,7 @@ Building:
   2. Copy the directory under a new name, then find the two places where R packages are installed.  Swap out the package names for the packages you want in your new layer.
   3. Build the layer, publish it in your AWS Lambda console, and then publish a Function that depends on it, to test it out.  Repeat the process until you've proven it works successfully.  
 
-### Compiling on EC2 (TBD)
+### Compiling on EC2 (Don't Use - Not updated)
 
 In case the Docker image does not properly represent the lambda environment,
 we also provide a script which launches an EC2 instance, compiles R, and uploads the zipped distribution to S3.
@@ -97,7 +124,7 @@ The script produces a zip containing a functional R installation in `/opt/R/`.
 The relevant files can be found in `r/build/bin/`.
 Use this R distribution for building the layers.
 
-### Building custom layers (TBD)
+### Building custom layers (Don't use - Not updated)
 
 In order to install additional R packages, you can create a lambda layer containing the libraries, just as in the second example. You must use the the compiled package files. The easiest way is to install the package with `install.packages()` and copy the resulting folder in `$R_LIBS`. Using only the package sources does not suffice. The file structure must be `R/library/<my-library>`. If your package requires system libraries, place them in `R/lib/`.
 
