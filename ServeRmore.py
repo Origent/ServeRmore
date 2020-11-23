@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, time, srvl_config, srvl_connect, VERSION
+import sys, time, srvl_config, VERSION
 from signal import signal, SIGINT
 from sys import exit
 
@@ -65,7 +65,7 @@ class srm:
         if not self.cc.settings["builder"]["instance_id"]:
             import boto3
             ec2 = boto3.resource('ec2')
-            self.name_str = 'srm_builder'+str(VERSION.VERSION)
+            self.name_str = 'srm_builder_'+str(VERSION.srm_VERSION)
             instance = ec2.create_instances(
                 BlockDeviceMappings=[{
                     'DeviceName': '/dev/xvda',
@@ -117,7 +117,7 @@ class srm:
             time.sleep(1)
             self.cc.set("builder", "domain_name", instance.public_dns_name)
             print("Proceeding with bootstrapping instance.")
-            self.vm_setup()
+            self.bootstrap()
         else:
             print("Instance already exists.")
 
@@ -132,7 +132,7 @@ class srm:
             print("No instance is allocated.")
 
     def cpu(self):
-        cloud_connect = srvl_connect.srvlConnect()
+        cloud_connect = srvl_config.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh(
             "printf '\nCPU core usage:' && " \
@@ -158,13 +158,16 @@ class srm:
                 return False
 
     def ssh(self):
-        cloud_connect = srvl_connect.srvlConnect()
+        cloud_connect = srvl_config.srvlConnect()
         cloud_connect.evoke_ssh('ec2-user',self.cc.settings["builder"]["domain_name"])
+
+    def bootstrap(self):
+        self.vm_setup()
 
     def vm_setup(self):
         from pathlib import Path
-        print("Setting up VM for RStudio Docker Container...")
-        cloud_connect = srvl_connect.srvlConnect()
+        print("Setting up VM for Lambda Layer Build Container...")
+        cloud_connect = srvl_config.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         print("Updating the VM...")
         cloud_connect.run_ssh("sudo yum -y update")
@@ -175,7 +178,7 @@ class srm:
         cloud_connect.run_ssh("mkdir -p /home/ec2-user/.aws")
         cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["git"]["private_key"])
         cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', 'config')
-        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["aws"]["private_key"])
+        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["git"]["private_key"])
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'credentials')
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'config')
         cloud_connect.run_ssh("ssh-keyscan -H github.com >> /home/ec2-user/.ssh/known_hosts")
@@ -183,7 +186,7 @@ class srm:
 
     def restart_docker_service(self):
         print("Restart Docker Service...")
-        cloud_connect = srvl_connect.srvlConnect()
+        cloud_connect = srvl_config.srvlConnect()
         cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
         cloud_connect.run_ssh("sudo service docker start")
         cloud_connect.terminate_ssh()

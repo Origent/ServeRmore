@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='serveRmore',
-    version=VERSION.VERSION,
+    version=VERSION.srm_VERSION,
     description='Serve R more on Serverless.',
     long_description=long_description,
     long_description_content_type="text/markdown",

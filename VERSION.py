@@ -1,3 +1,3 @@
 #!python3
 
-VERSION = "0.1.0"
+srm_VERSION = "0.1.0"
