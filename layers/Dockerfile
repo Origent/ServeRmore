@@ -18,6 +18,7 @@ WORKDIR ${R_DIR}
 
 RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/opt/ --enable-R-shlib && \
    make && \
+   sed -i '122s/.*/SED=\/bin\/sed/' bin/R && \
    cp /usr/lib64/libgfortran.so.4 lib/ && \
    cp /usr/lib64/libgomp.so.1 lib/ && \
    cp /usr/lib64/libquadmath.so.0 lib/ && \
