@@ -22,19 +22,19 @@ class srm:
         import boto3
         client = boto3.client('lambda')
         response = client.create_function(
-            FunctionName=self.cc.settings["lambda"]["name"],
-            Runtime=self.cc.settings["lambda"]["runtime"],
-            Role=self.cc.settings["lambda"]["arn_role"],
+            FunctionName=self.cc.settings["function"]["name"],
+            Runtime=self.cc.settings["function"]["runtime"],
+            Role=self.cc.settings["function"]["arn_role"],
             Handler='lambda.handler',
             Code={
-                'S3Bucket': self.cc.settings["aws"]["s3_bucket"],
-                'S3Key': self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["lambda"]["zip_file_name"]
+                'S3Bucket': self.cc.settings["function"]["s3_bucket"],
+                'S3Key': self.cc.settings["function"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
             },
             Timeout=60,
             MemorySize=3008,
             Layers=[
-                self.cc.settings["lambda"]["arn_runtime_layer"],
-                self.cc.settings["lambda"]["arn_custom_layer"]
+                self.cc.settings["function"]["arn_runtime_layer"],
+                self.cc.settings["function"]["arn_custom_layer"]
             ]
         )
 
@@ -42,30 +42,30 @@ class srm:
         import boto3
         client = boto3.client('lambda')
         response = client.invoke(
-            FunctionName=self.cc.settings["lambda"]["name"]
+            FunctionName=self.cc.settings["function"]["name"]
         )
 
     def lambda_update(self):
         import boto3
         client = boto3.client('lambda')
         response = client.update_function_code(
-            FunctionName=self.cc.settings["lambda"]["name"],
-            S3Bucket=self.cc.settings["aws"]["s3_bucket"],
-            S3Key=self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["lambda"]["zip_file_name"]
+            FunctionName=self.cc.settings["function"]["name"],
+            S3Bucket=self.cc.settings["function"]["s3_bucket"],
+            S3Key=self.cc.settings["function"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
         )
 
     def lambda_destroy(self):
         import boto3
         client = boto3.client('lambda')
         response = client.delete_function(
-            FunctionName=self.cc.settings["lambda"]["name"]
+            FunctionName=self.cc.settings["function"]["name"]
         )
 
     def create(self):
-        if not self.cc.settings["builder"]["instance_id"]:
+        if not self.cc.settings["layers"]["instance_id"]:
             import boto3
             ec2 = boto3.resource('ec2')
-            self.name_str = 'srm_builder_'+str(VERSION.srm_VERSION)
+            self.name_str = 'srm_layers_'+str(VERSION.srm_VERSION)
             instance = ec2.create_instances(
                 BlockDeviceMappings=[{
                     'DeviceName': '/dev/xvda',
@@ -84,15 +84,15 @@ class srm:
                     },
                 }],
                 SecurityGroupIds=[
-                    str(self.cc.settings["aws"]["ssh_security_group"]),
-                    str(self.cc.settings["aws"]["default_security_group"])
+                    str(self.cc.settings["layers"]["ssh_security_group"]),
+                    str(self.cc.settings["layers"]["default_security_group"])
                 ],
-                SubnetId=str(self.cc.settings["aws"]["subnet"]),
-                ImageId=str(self.cc.settings["builder"]["ami"]),
-                KeyName=str(self.cc.settings["aws"]["private_key"].replace('.pem', '')),
+                SubnetId=str(self.cc.settings["layers"]["subnet"]),
+                ImageId=str(self.cc.settings["layers"]["ami"]),
+                KeyName=str(self.cc.settings["layers"]["private_key"].replace('.pem', '')),
                 MinCount=1,
                 MaxCount=1,
-                InstanceType=str(self.cc.settings["builder"]["instance_type"]),
+                InstanceType=str(self.cc.settings["layers"]["instance_type"]),
                 TagSpecifications=[
                     {
                         'ResourceType': 'instance',
@@ -106,26 +106,26 @@ class srm:
                 ])
             print("Please wait for instance bootup.")
             time.sleep(5)
-            self.cc.set("builder", "instance_id", instance[0].instance_id)
-            print("New instance ID: " + self.cc.settings["builder"]["instance_id"])
+            self.cc.set("layers", "instance_id", instance[0].instance_id)
+            print("New instance ID: " + self.cc.settings["layers"]["instance_id"])
             state = 'pending'
             while not state == 'running':
                 time.sleep(5)
-                instance = ec2.Instance(self.cc.settings["builder"]["instance_id"])
+                instance = ec2.Instance(self.cc.settings["layers"]["instance_id"])
                 state = instance.state["Name"]
                 print("STATUS: "+state)
             time.sleep(1)
-            self.cc.set("builder", "domain_name", instance.public_dns_name)
+            self.cc.set("layers", "domain_name", instance.public_dns_name)
             print("Proceeding with bootstrapping instance.")
             self.bootstrap()
         else:
             print("Instance already exists.")
 
     def status(self):
-        if self.cc.settings["builder"]["instance_id"]:
+        if self.cc.settings["layers"]["instance_id"]:
             import boto3
             resource = boto3.resource('ec2')
-            instance = resource.Instance(self.cc.settings["builder"]["instance_id"])
+            instance = resource.Instance(self.cc.settings["layers"]["instance_id"])
             state = instance.state["Name"]
             print("Instance is "+ state + ".")
         else:
@@ -133,7 +133,7 @@ class srm:
 
     def cpu(self):
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["layers"]["private_key"], self.cc.settings["layers"]["domain_name"])
         cloud_connect.run_ssh(
             "printf '\nCPU core usage:' && " \
             "mpstat -P ALL 1 1 | awk '/Average:/ && $2 ~ /[0-9]/ {print $3\"%\"}' &&" \
@@ -145,13 +145,13 @@ class srm:
 
     def terminate(self):
         if input("are you sure? (y/n) ") == "y":
-            if self.cc.settings["builder"]["instance_id"]:
+            if self.cc.settings["layers"]["instance_id"]:
                 import boto3
                 ec2 = boto3.resource('ec2')
-                instance = ec2.Instance(self.cc.settings["builder"]["instance_id"])
+                instance = ec2.Instance(self.cc.settings["layers"]["instance_id"])
                 response = instance.terminate()
-                self.cc.set("builder", "instance_id", '')
-                self.cc.set("builder", "domain_name", '')
+                self.cc.set("layers", "instance_id", '')
+                self.cc.set("layers", "domain_name", '')
                 print("Instance has been terminated.")
             else:
                 print("No instance is running.")
@@ -159,7 +159,7 @@ class srm:
 
     def ssh(self):
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.evoke_ssh('ec2-user',self.cc.settings["builder"]["domain_name"])
+        cloud_connect.evoke_ssh('ec2-user',self.cc.settings["layers"]["domain_name"])
 
     def bootstrap(self):
         self.vm_setup()
@@ -168,7 +168,7 @@ class srm:
         from pathlib import Path
         print("Setting up VM for Lambda Layer Build Container...")
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["layers"]["private_key"], self.cc.settings["layers"]["domain_name"])
         print("Updating the VM...")
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y install nfs-utils sysstat python3-setuptools")
@@ -189,7 +189,7 @@ class srm:
     def restart_docker_service(self):
         print("Restart Docker Service...")
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["builder"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["layers"]["private_key"], self.cc.settings["layers"]["domain_name"])
         cloud_connect.run_ssh("sudo service docker start")
         cloud_connect.terminate_ssh()
         print("Docker Service restarted...")

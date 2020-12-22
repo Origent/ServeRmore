@@ -11,7 +11,7 @@ WORKDIR /opt/R
 RUN cp -R /usr/lib64/R/* . && \
   cp /usr/lib64/libgomp.so.1 lib/ && \
   cp /usr/lib64/libquadmath.so.0 lib/ && \
-  cp /usr/lib64/libstdc++.so.6 lib/ && \
+  cp /usr/lib64/libstdc++.so.6 lib/
 
 CMD mkdir -p /var/r/ && \
   mkdir -p /var/r-gbm/R/library/ && \

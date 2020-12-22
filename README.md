@@ -26,16 +26,15 @@ srm status
 
 2. At minimum for publishing function code, you'll need the following filled out in your ~/serveRmore.yaml file:
 ```
-aws:
-  s3_bucket:
-  s3_key:
-lambda:
+function:
+  name:
+  zip_file_name: null
+  runtime: provided.al2
   arn_role: arn:aws:iam::<AWS_ID>:role/lambda_basic_execution
   arn_runtime_layer: arn:aws:lambda:us-east-1:<AWS_ID>:layer:<name>:<version>
   arn_custom_layer: arn:aws:lambda:us-east-1:<AWS_ID:layer:<name>:<version>
-  name:
-  r_version:
-  zip_file_name:
+  s3_bucket:
+  s3_key:
 ```
 
 3. Create a new lambda.R script and create a "handler" method in R.  Insert "hello world" or custom code inside your handler method.
