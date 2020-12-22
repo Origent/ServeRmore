@@ -14,17 +14,10 @@ ToDo:
 
 You can build two layers from scratch.  Please take the following steps to complete.
 
-1. Use the "srm" utility to create a new VM.  Then login to it.
+1. Use the "srm" utility to create a new VM.  Then login to it.  The ServeRmore repo should already be in your home folder.
 ```
 srm create
 srm ssh
-```
-
-2. Pull down the ServeRmore repo locally.
-```
-git clone git@github.com/Origent/ServeRmore.git
-git fetch origin
-git pull origin srm_0.1.0
 ```
 
 3. We want to make sure that shell/terminal scripts are executable.
@@ -52,12 +45,27 @@ If you plan to publish the runtime and gbm layers, you need to have a recent ver
 
 ### Debugging
 
-If there are challenges with the layer build, the following command can be run in order to interact with the environment inside the docker service used to build the layer.
+If there are challenges with the layer build, the following can be run to interact with the environment inside the docker service used to build the layer. Once inside the Terminal of the Docker container, the individual commands listed in Dockerfile can be run.
+
+Starting with the vanilla lambda environment:
 ```
-docker run -it lambci/lambda:build-provided.al2 bash
+docker run -it -v /home/ec2-user/ServeRmore/layers/r/build:/opt/R:ro,delegated lambda-r:build-4.0.2 bash
 ```
 
-Once inside the Terminal of the Docker service, the individual commands listed in Dockerfile can be run.
+If you have already run build.sh, you can log into the build environment:
+```
+docker run -it lambda-r:build-4.0.2 bash
+```
+
+If you're curious what shared libraries outside of the installed R folder is being used in the build environment, you can run the following to get a list:
+```
+ldd /usr/lib64/R/bin/exec/R
+```
+
+It is possible to test the 'current' directory where the runtime layer build exists in an unzipped capacity in the VM, with a super basic handler.R script that can contain something as simple as 'print("Hello World!")'. The following command maps the current directory into the Docker container service and the expected execution folder, and runs the local handler.R file against the runtime.  This is not fully developed and is only theoretical for us right now:
+```
+docker run --rm -v "$PWD":/opt:ro,delegated lambda-r:build-4.0.2 handler.R
+```
 
 ### r-runtime layer
 

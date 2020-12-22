@@ -10,9 +10,8 @@ mkdir -p ${BUILD_DIR}/layer/R/
 cp ${BASE_DIR}/src/* ${BUILD_DIR}/layer/
 cd ${BUILD_DIR}/layer/
 cp -r ${BASE_DIR}/../r/build/bin/* R/
-rm -r R/doc/manual/
 #remove some libraries to save space
-recommended=(boot class cluster codetools foreign KernSmooth lattice MASS Matrix mgcv nlme nnet rpart spatial survival)
+recommended=(boot class cluster codetools foreign KernSmooth MASS mgcv nlme nnet rpart spatial Matrix lattice survival gridExtra gtable gbm)
 for package in "${recommended[@]}"
 do
    rm -r R/library/${package}/

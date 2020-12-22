@@ -16,7 +16,6 @@ BUILD_DIR=${BASE_DIR}/build/
 rm -rf ${BUILD_DIR}
 
 mkdir -p ${BUILD_DIR}/layer/
-docker run -v ${BUILD_DIR}/layer/:/var/r-gbm -v ${BASE_DIR}/entrypoint.sh:/entrypoint.sh \
-    lambda-r:build-${VERSION} /entrypoint.sh
+docker run -v ${BUILD_DIR}/layer/:/var/r-gbm lambda-r:build-${VERSION}
 sudo chown -R $(whoami):$(whoami) ${BUILD_DIR}/layer/
 chmod -R 755 ${BUILD_DIR}/layer/

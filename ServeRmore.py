@@ -23,7 +23,7 @@ class srm:
         client = boto3.client('lambda')
         response = client.create_function(
             FunctionName=self.cc.settings["lambda"]["name"],
-            Runtime='provided',
+            Runtime=self.cc.settings["lambda"]["runtime"],
             Role=self.cc.settings["lambda"]["arn_role"],
             Handler='lambda.handler',
             Code={
@@ -173,15 +173,17 @@ class srm:
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y install nfs-utils sysstat python3-setuptools")
         cloud_connect.run_ssh("pip3 install awscli --upgrade --user")
+        cloud_connect.run_ssh("sudo yum -y -q install git nano zip")
         cloud_connect.upload_file_ssh(str(Path.home())+'/', '/home/ec2-user/', '.gitconfig')
-        cloud_connect.run_ssh("mkdir -p /home/ec2-user/.ssh")
         cloud_connect.run_ssh("mkdir -p /home/ec2-user/.aws")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["git"]["private_key"])
-        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', 'config')
-        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["git"]["private_key"])
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'credentials')
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'config')
+        cloud_connect.run_ssh("mkdir -p /home/ec2-user/.ssh")
+        cloud_connect.upload_file_ssh(str(Path.home())+'/.ssh/', '/home/ec2-user/.ssh/', self.cc.settings["git"]["private_key"])
+        cloud_connect.run_ssh("echo 'IdentityFile ~/.ssh/github.pem' > /home/ec2-user/.ssh/config")
+        cloud_connect.run_ssh("sudo chmod -R go-rwx /home/ec2-user/.ssh/")
         cloud_connect.run_ssh("ssh-keyscan -H github.com >> /home/ec2-user/.ssh/known_hosts")
+        cloud_connect.run_ssh("git clone git@github.com:Origent/ServeRmore.git")
         cloud_connect.terminate_ssh()
 
     def restart_docker_service(self):
