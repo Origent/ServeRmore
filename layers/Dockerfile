@@ -1,7 +1,8 @@
 FROM lambci/lambda:build-provided.al2
 
 RUN amazon-linux-extras enable R4 && \
- yum install -q -y wget R readline-devel libXt-devel curl-devel && \ 
+ yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel && \ 
+#Rscript -e 'install.packages(c("utils", "stats"), repos="http://cran.r-project.org")' && \
  #yum install -q -y wget curl-devel openssl-devel libxml2-devel R && \
  # Rscript -e 'install.packages(c("httr", "logging", "yaml", "jsonlite", "aws.s3"), repos="http://cran.r-project.org")' && \
   #Rscript -e 'install.packages(c("Matrix", "survival", "gridExtra", "lattice", "gbm"), repos="http://cran.r-project.org")' && \
@@ -19,8 +20,8 @@ RUN cd ~ && \
 
 WORKDIR /opt/R/
 
-RUN ./configure --prefix=${R_DIR} --enable-R-shlib && \
-  make && \
+RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/opt/ --enable-R-shlib  && \
+  make && \ 
   cp /usr/lib64/libgomp.so.1 lib/ && \
   cp /usr/lib64/libgfortran.so.4 lib/ && \   
   cp /usr/lib64/libquadmath.so.0 lib/ && \
