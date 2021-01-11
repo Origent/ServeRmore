@@ -2,11 +2,8 @@ FROM lambci/lambda:build-provided.al2
 
 RUN amazon-linux-extras enable R4 && \
  yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel && \ 
-#Rscript -e 'install.packages(c("utils", "stats"), repos="http://cran.r-project.org")' && \
  #yum install -q -y wget curl-devel openssl-devel libxml2-devel R && \
- # Rscript -e 'install.packages(c("httr", "logging", "yaml", "jsonlite", "aws.s3"), repos="http://cran.r-project.org")' && \
-  #Rscript -e 'install.packages(c("Matrix", "survival", "gridExtra", "lattice", "gbm"), repos="http://cran.r-project.org")' && \
-  mkdir -p /opt/R
+ mkdir -p /opt/R
 
 ARG VERSION=4.0.2
 ARG R_DIR=/opt/R/
