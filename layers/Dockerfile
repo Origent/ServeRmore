@@ -1,7 +1,7 @@
 FROM lambci/lambda:build-provided.al2
 
 RUN amazon-linux-extras enable R4 && \
- yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel && \ 
+ yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel openssl-devel libxml2-devel && \ 
  #yum install -q -y wget curl-devel openssl-devel libxml2-devel R && \
  mkdir -p /opt/R
 
@@ -24,6 +24,8 @@ RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/o
   cp /usr/lib64/libquadmath.so.0 lib/ && \
   cp /usr/lib64/libpcre2-8.so.0 lib/
   # cp /usr/lib64/libstdc++.so.6 lib/
+
+RUN ./bin/Rscript -e 'install.packages(c("httr", "logging", "yaml", "jsonlite", "aws.s3"), repos="https://cran.r-project.org")'
 
 CMD mkdir -p /var/r/ && \
   cp -r bin/ lib/ etc/ library/ doc/ modules/ share/ /var/r/ 
