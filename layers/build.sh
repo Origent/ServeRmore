@@ -16,5 +16,3 @@ cd ${BASE_DIR}/r
 ./build.sh ${VERSION}
 cd ${BASE_DIR}/r-runtime
 ./build.sh
-cd ${BASE_DIR}/r-gbm
-./build.sh ${VERSION}
