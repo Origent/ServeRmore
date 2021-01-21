@@ -22,8 +22,8 @@ RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/o
   cp /usr/lib64/libgomp.so.1 lib/ && \
   cp /usr/lib64/libgfortran.so.4 lib/ && \   
   cp /usr/lib64/libquadmath.so.0 lib/ && \
-  cp /usr/lib64/libpcre2-8.so.0 lib/ && \
-  cp /usr/lib64/ld-linux-x86-64.so.2 lib/
+  cp /usr/lib64/libpcre2-8.so.0 lib/
+#  cp /usr/lib64/ld-linux-x86-64.so.2 lib/
 
 RUN ./bin/Rscript -e 'install.packages(c("httr", "logging", "yaml", "jsonlite", "aws.s3", "Matrix", "survival", "gridExtra", "lattice", "gbm"), repos="http://cran.r-project.org")'
 
