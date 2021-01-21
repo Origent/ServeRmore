@@ -13,5 +13,3 @@ fi
 BASE_DIR=$(pwd)
 cd ${BASE_DIR}/r-runtime
 ./deploy.sh ${VERSION}
-cd ${BASE_DIR}/r-gbm
-./deploy.sh ${VERSION}

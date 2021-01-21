@@ -1,5 +1,6 @@
 #!/bin/sh
 
 set -euo pipefail
+PATH=$PATH:/opt/R/bin/
 
 /opt/R/bin/Rscript /opt/bootstrap.R
