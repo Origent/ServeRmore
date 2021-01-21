@@ -13,7 +13,7 @@ RUN cd ~ && \
   wget -q https://cran.r-project.org/src/base/R-4/R-${VERSION}.tar.gz && \
   tar -xf R-${VERSION}.tar.gz && \ 
   mv R-${VERSION}/* ${R_DIR} && \
-  rm R-${VERSION}.tar.gz && \
+  rm R-${VERSION}.tar.gz
 
 WORKDIR /opt/R/
 
