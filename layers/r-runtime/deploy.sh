@@ -18,6 +18,7 @@ zip -r -q r-runtime-${VERSION}.zip .
 mkdir -p ${BUILD_DIR}/dist/
 mv r-runtime-${VERSION}.zip ${BUILD_DIR}/dist/
 version_="${VERSION//\./_}"
+aws s3 cp ${BUILD_DIR}/dist/r-runtime-${VERSION}.zip s3://origent-api-dev/dx/als/r-runtime-${VERSION}.zip 
 aws lambda publish-layer-version \
     --layer-name r-runtime-${version_} \
-    --zip-file fileb://${BUILD_DIR}/dist/r-runtime-${VERSION}.zip
+    --content S3Bucket=origent-api-dev,S3Key=dx/als/r-runtime-${VERSION}.zip
