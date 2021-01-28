@@ -30,12 +30,7 @@ function:
   runtime: provided.al2
 runtime_layer:
   arn: arn:aws:lambda:us-east-1:<AWS_ID>:layer:<name>:<version>
-  r_packages:
-  - httr
-  - logging
-  - yaml
-  - jsonlite
-  - aws.s3
+  r_packages: httr logging yaml jsonlite aws.s3 
   r_version: 4.0.2
 build_vm:
   ami: ami-02507631a9f7bc956
