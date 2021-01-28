@@ -27,14 +27,13 @@ class srm:
             Role=self.cc.settings["function"]["arn_role"],
             Handler=self.cc.settings["function"]["handler"],
             Code={
-                'S3Bucket': self.cc.settings["function"]["s3_bucket"],
-                'S3Key': self.cc.settings["function"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
+                'S3Bucket': self.cc.settings["aws"]["s3_bucket"],
+                'S3Key': self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
             },
             Timeout=60,
             MemorySize=3008,
             Layers=[
-                self.cc.settings["function"]["arn_runtime_layer"],
-                self.cc.settings["function"]["arn_custom_layer"]
+                self.cc.settings["runtime_layer"]["arn"]
             ]
         )
 
@@ -50,8 +49,8 @@ class srm:
         client = boto3.client('lambda')
         response = client.update_function_code(
             FunctionName=self.cc.settings["function"]["name"],
-            S3Bucket=self.cc.settings["function"]["s3_bucket"],
-            S3Key=self.cc.settings["function"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
+            S3Bucket=self.cc.settings["aws"]["s3_bucket"],
+            S3Key=self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
         )
 
     def lambda_destroy(self):
@@ -89,7 +88,7 @@ class srm:
                 ],
                 SubnetId=str(self.cc.settings["build_vm"]["subnet"]),
                 ImageId=str(self.cc.settings["build_vm"]["ami"]),
-                KeyName=str(self.cc.settings["aws"]["private_key"].replace('.pem', '')),
+                KeyName=str(self.cc.settings["build_vm"]["private_key"].replace('.pem', '')),
                 MinCount=1,
                 MaxCount=1,
                 InstanceType=str(self.cc.settings["build_vm"]["instance_type"]),
@@ -125,7 +124,7 @@ class srm:
         if self.cc.settings["build_vm"]["instance_id"]:
             from pathlib import Path
             cloud_connect = srvl_config.srvlConnect()
-            cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+            cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
             print("Running Build script for Lambda Layer...")
             cloud_connect.run_ssh("./build.sh " + self.cc.settings["runtime_layer"]["r_version"] +" "+ self.cc.settings["runtime_layer"]["r_packages"] + " 2>&1")
             print("Running Deploy script for Lambda Layer...")
@@ -152,16 +151,19 @@ class srm:
             print("No instance is allocated.")
 
     def cpu(self):
-        cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
-        cloud_connect.run_ssh(
-            "printf '\nCPU core usage:' && " \
-            "mpstat -P ALL 1 1 | awk '/Average:/ && $2 ~ /[0-9]/ {print $3\"%\"}' &&" \
-            "printf 'Memory used:' &&" \
-            "free -m | awk 'NR==2{print int($3*100/$2)\"%\" }' && " \
-            "printf 'Storage used:' &&" \
-            "df -h | awk '$NF==\"/\"{print $5}'")
-        cloud_connect.terminate_ssh()
+        if self.cc.settings["build_vm"]["instance_id"]:
+            cloud_connect = srvl_config.srvlConnect()
+            cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+            cloud_connect.run_ssh(
+                "printf '\nCPU core usage:' && " \
+                "mpstat -P ALL 1 1 | awk '/Average:/ && $2 ~ /[0-9]/ {print $3\"%\"}' &&" \
+                "printf 'Memory used:' &&" \
+                "free -m | awk 'NR==2{print int($3*100/$2)\"%\" }' && " \
+                "printf 'Storage used:' &&" \
+                "df -h | awk '$NF==\"/\"{print $5}'")
+            cloud_connect.terminate_ssh()
+        else:
+            print("No instance is allocated.")
 
     def terminate(self):
         if input("are you sure? (y/n) ") == "y":
@@ -178,14 +180,17 @@ class srm:
                 return False
 
     def ssh(self):
-        cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.evoke_ssh('ec2-user',self.cc.settings["build_vm"]["domain_name"])
+        if self.cc.settings["build_vm"]["instance_id"]:
+            cloud_connect = srvl_config.srvlConnect()
+            cloud_connect.evoke_ssh('ec2-user',self.cc.settings["build_vm"]["domain_name"])
+        else:
+            print("No instance is allocated.")
 
     def vm_setup(self):
         from pathlib import Path
         print("Setting up VM for Lambda Layer Build Container...")
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
         print("Updating the VM...")
         cloud_connect.run_ssh("sudo yum -y update")
         cloud_connect.run_ssh("sudo yum -y install nfs-utils sysstat python3-setuptools")
@@ -208,7 +213,7 @@ class srm:
     def restart_docker_service(self):
         print("Restart Docker Service...")
         cloud_connect = srvl_config.srvlConnect()
-        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["aws"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+        cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
         cloud_connect.run_ssh("sudo service docker start")
         cloud_connect.terminate_ssh()
         print("Docker Service restarted...")
