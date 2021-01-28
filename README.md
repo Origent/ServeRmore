@@ -20,7 +20,6 @@ python3 -m pip install serveRmore
 1. Create a new file in your home folder called "serveRmore.yaml". Here's a template of ~/serveRmore.yaml we'll need to populate:
 ```
 aws:
-  private_key: null
   s3_bucket: null
   s3_key: null
 function:
@@ -46,6 +45,7 @@ build_vm:
   instance_type: t2.large
   domain_name: null
   instance_id: null
+  private_key: null
 ```
 
 At a minimum for deploying a new Lambda function only (and not a Lambda layer), you'll need your AWS Account ID, the path to your starting method call placed in "handler", the name of your function, and the temporary zip file name. You'll also want to add a private key from AWS that you have downloaded, and that we can use for EC2 instances. Finally, you'll want to setup an S3 bucket for storage. It's also expected that you have a runtime layer "ARN" address already configured.  If you don't, you'll want to skip to the custom runtime layer building section.

@@ -126,7 +126,7 @@ class srm:
             cloud_connect = srvl_config.srvlConnect()
             cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
             print("Running Build script for Lambda Layer...")
-            cloud_connect.run_ssh("./build.sh " + self.cc.settings["runtime_layer"]["r_version"] +" "+ self.cc.settings["runtime_layer"]["r_packages"] + " 2>&1")
+            cloud_connect.run_ssh("./build.sh " + self.cc.settings["runtime_layer"]["r_version"] +" \""+ str(self.cc.settings["runtime_layer"]["r_packages"]) + "\" 2>&1")
             print("Running Deploy script for Lambda Layer...")
             cloud_connect.run_ssh("./deploy.sh " + self.cc.settings["runtime_layer"]["r_version"] + " " + self.cc.settings["aws"]["s3_bucket"] + " " + self.cc.settings["aws"]["s3_key"] + " 2>&1")
             cloud_connect.terminate_ssh()

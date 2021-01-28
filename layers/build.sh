@@ -2,8 +2,7 @@
 
 set -euo pipefail
 VERSION=$1
-IFS=', ' read -r -a array <<< "$2"
-PACKAGES=${array[@]}
+PACKAGES=$2
 
 BASE_DIR=$(pwd)
 BUILD_DIR=${BASE_DIR}/build

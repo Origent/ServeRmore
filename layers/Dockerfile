@@ -25,7 +25,7 @@ RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/o
   cp /usr/lib64/libquadmath.so.0 lib/ && \
   cp /usr/lib64/libpcre2-8.so.0 lib/
 
-RUN for i in ${PACKAGES}; do ./bin/Rscript -e "install.packages('$i', repos='https://cran.r-project.org')"; done
+RUN for i in ${PACKAGES}; do ./bin/Rscript -e "install.packages(\"$i\", repos=\"https://cran.r-project.org\")"; done;
 
 CMD mkdir -p /var/r/ && \
   cp -r bin/ lib/ etc/ library/ doc/ modules/ share/ /var/r/
