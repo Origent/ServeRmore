@@ -78,7 +78,7 @@ class srvlConfig:
         - utility helpers
     bash$: srm lambda list | create | update | destroy
         - List functions, create your function, update it, or destroy it
-    bash$: srm create | ssh | cpu | status | destroy
+    bash$: srm create | deploy | terminate | ssh | cpu | status
         - Create and interact with your layer builder VM\n\n"""
         print(s)
 

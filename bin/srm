@@ -55,6 +55,9 @@ def main():
     elif sys.argv[1] == 'create':
         vm = ServeRmore.srm()
         vm.create()
+    elif sys.argv[1] == 'deploy':
+        vm = ServeRmore.srm()
+        vm.deploy()
     elif sys.argv[1] == 'status':
         vm = ServeRmore.srm()
         vm.status()

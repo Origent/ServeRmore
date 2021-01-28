@@ -5,7 +5,8 @@ RUN amazon-linux-extras enable R4 && \
  mkdir -p /opt/R/bin && \
  mv /usr/bin/which /opt/R/bin
 
-ARG VERSION=4.0.2
+ARG VERSION
+ARG PACKAGES
 ARG R_DIR=/opt/R/
 ENV PATH="/opt/R/bin:${PATH}"
 
@@ -20,12 +21,11 @@ WORKDIR /opt/R/
 RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/opt/ --enable-R-shlib  && \
   make && \ 
   cp /usr/lib64/libgomp.so.1 lib/ && \
-  cp /usr/lib64/libgfortran.so.4 lib/ && \   
+  cp /usr/lib64/libgfortran.so.4 lib/ && \
   cp /usr/lib64/libquadmath.so.0 lib/ && \
   cp /usr/lib64/libpcre2-8.so.0 lib/
-#  cp /usr/lib64/ld-linux-x86-64.so.2 lib/
 
-RUN ./bin/Rscript -e 'install.packages(c("httr", "logging", "yaml", "jsonlite", "aws.s3", "Matrix", "survival", "gridExtra", "lattice", "gbm"), repos="http://cran.r-project.org")'
+RUN for i in ${PACKAGES}; do ./bin/Rscript -e "install.packages('$i', repos='https://cran.r-project.org')"; done
 
 CMD mkdir -p /var/r/ && \
   cp -r bin/ lib/ etc/ library/ doc/ modules/ share/ /var/r/
