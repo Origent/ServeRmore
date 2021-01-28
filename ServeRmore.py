@@ -25,7 +25,7 @@ class srm:
             FunctionName=self.cc.settings["function"]["name"],
             Runtime=self.cc.settings["function"]["runtime"],
             Role=self.cc.settings["function"]["arn_role"],
-            Handler='lambda.handler',
+            Handler=self.cc.settings["function"]["handler"],
             Code={
                 'S3Bucket': self.cc.settings["function"]["s3_bucket"],
                 'S3Key': self.cc.settings["function"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
