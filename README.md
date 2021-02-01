@@ -130,9 +130,12 @@ The following is included and required for the Runtime to work:
 
 ### Base R Runtime Layer Debugging
 
-If there are challenges with the layer build, there are ways to enter into an interactive mode. First, make sure that 'srm deploy' has already been run once, and that there is a VM running.  Entering 'srm status' will indicate status. Next, enter 'srm ssh', to login to the VM itself.  Then use the following command to login to the Docker container terminal itself:
+If there are challenges with the layer build, there are ways to enter into an interactive mode. First, make sure that you've already run deploy once before without terminating. Next, check the status to ensure a VM is running. Finally login to the VM itself and then the Docker container through the following commands:
 
 ```
+srm deploy
+srm status
+srm ssh
 docker run -it lambda-r:build-4.0.2 bash
 ```
 
