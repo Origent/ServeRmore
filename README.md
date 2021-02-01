@@ -5,7 +5,7 @@ Python Package Index Releases: [https://pypi.org/project/serveRmore/](https://py
 
 ## Requirements
 
-Please refer to our [LAPTOP.md Guide](LAPTOP.md) for necessary manual configurations.
+Please refer to the [LAPTOP.md Guide](LAPTOP.md) for necessary manual configurations.
 
 Please refer to your cloud platform for additional information:
 * [AWS Lambda](AWS.md)
@@ -17,7 +17,8 @@ python3 -m pip install serveRmore
 
 ## Quickstart
 
-1. Create a new file in your home folder called "serveRmore.yaml". Here's a template of ~/serveRmore.yaml we'll need to populate:
+1. Create a new file called "**serveRmore.yaml**" in your home directory. The template for the YAML file is shown below:  
+
 ```
 aws:
   s3_bucket: null
@@ -43,9 +44,19 @@ build_vm:
   private_key: null
 ```
 
-At a minimum for deploying a new Lambda function only (and not a Lambda layer), you'll need your AWS Account ID, the path to your starting method call placed in "handler", the name of your function, and the temporary zip file name. You'll also want to add a private key from AWS that you have downloaded, and that we can use for EC2 instances. Finally, you'll want to setup an S3 bucket for storage. It's also expected that you have a runtime layer "ARN" address already configured.  If you don't, you'll want to skip to the custom runtime layer building section.
+For deploying a new Lambda function only (i.e. not including a Lambda _layer_), at the least you will need the following parameters: 
 
-2. Create a new lambda.R script and create a "handler" method in R.  Insert "hello world" or custom code inside your handler method.
+* `arn_role`: AWS Account ID 
+* `handler`: path to the starting method call
+* `name`: the name of the Lambda function
+* `zip_file_name`: temporary zip file that contains the main script along with any helper scripts required by the function
+* `private_key`: SSH key for AWS EC2 (see step 3 of the [LAPTOP.md Guide](LAPTOP.md))
+* `s3_bucket`: storage for Lambda function script
+* `arn`: "ARN" address for a configured runtime layer 
+
+**Note:** If you do not have a runtime layer pre-configured, follow the instructions for layer building under the section "Custom R Runtime Layers". 
+
+2. Create a new **lambda.R** script and create a `handler` method in R.  Insert "hello world" or custom code inside your handler method.
 
 3. Try out the SRM utility with any of these commands:
 
@@ -55,7 +66,7 @@ srm version
 srm status
 ```
 
-4. Create a new deploy.R script that will zip up your lambda.R and place on your AWS S3 bucket and key.
+4. Create a new **deploy.R** script to do the following: (1) generate a zipped file containing your **lambda.R** script (and other helper scripts required by the function) and (2) upload the zipped file to the S3 directory specified by the `s3_bucket` and `s3_key` parameters in the YAML file. 
 
 5. To deploy your zip file directly to Lambda, try out our new workflow here.
 ```
@@ -65,7 +76,7 @@ srm lambda invoke
 srm lambda destroy
 ```
 
-NOTE: 'create' will establish a brand new Lambda function if it does not exist, and publish your zip file.  'update' will republish your zip file, if your lambda function already exists.  
+**Note**: `create` will establish a brand new Lambda function, if it does not exist, and publish your zip file;  `update` will republish your zip file, if your lambda function already exists.  
 
 ## Custom R Runtime Layers
 
@@ -80,6 +91,7 @@ v0.1.1 - Additional Updates
 ## Changelog
 
 v0.1.0 - Revamped Lambda Service Layers and removed outdated deployment steps
+
 * Added support for R v4.0.2 
 * Simplified the layer building process and scripts
 * Support for one custom runtime layer for R with customizable R packages
@@ -87,10 +99,12 @@ v0.1.0 - Revamped Lambda Service Layers and removed outdated deployment steps
 * Removed reliance on r2py, Python 2, and R 3.4.2
 
 v0.0.2 - Introduces running R directly on Lambda via new AWS custom layers feature, big thanks to [@bakdata](https://github.com/bakdata).
+
 * Several new commands for initiating the R runtime version, creating new functions, updating them, and destroying them.
 * New documentation for how to build a custom R layer.
 
 v0.0.1 - Initial Release
+
 * Automated a genomics analysis guide that used Lambda with R.  Introduces an automated build process that creates a temporary AWS EC2 Virtual Machine, installs an R environment with CRAN and custom R packages, wraps them into a Lambda Package.  Also requires manual development of a Handler.py file that calls the R environment and R methods through r2py.
 * Provides an easy way to iterate and repackage after handler.py changes.
 

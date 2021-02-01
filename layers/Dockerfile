@@ -1,7 +1,7 @@
 FROM lambci/lambda:build-provided.al2
 
 RUN amazon-linux-extras enable R4 && \
- yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel openssl-devel libxml2-devel which && \ 
+ yum install -q -y wget readline-devel libXt-devel curl-devel bzip2-devel xz-devel pcre2-devel java-1.8.0-openjdk-devel openssl-devel libxml2-devel && \ 
  mkdir -p /opt/R/bin && \
  mv /usr/bin/which /opt/R/bin
 
