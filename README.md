@@ -77,7 +77,7 @@ Additional Settings for Building the Layer:
 * `default_security_group`: When creating an EC2 virtual machine instance, a security group is created automatically.  We recommend creating your own, or grabbing an existing security group ID and using that as your default here.  A security group is similar to a firewall, but is wrapped around a group of instances. 
 * `ssh_security_group`: In order for the scripts to work, SSH must be enabled and reachable with the new Virtual Machine the build script creates. We recommend creating a new security group and allowing SSH port 22 inside the security group, and recording the ID here.
 * `subnet`: When creating an EC2 virtual machine instance, it is added to a subnet and provided an IP address.  The subnets list can be found in the EC2 console.  Add the ID to one of them here.
-* `instance_type`: The type detrmines cost and capability of the virtual machine.  The type provided has been tested, but many others could potentially work.
+* `instance_type`: The type determines cost and capability of the virtual machine.  The type provided has been tested, but many others could potentially work.
 * `instance_id`: After the build script creates the virtual machine, the virtual machine Instance ID will be automatically placed here.
 * `domain_name`: After the build script creates the virtual machine, the domain name of the VM will be automatically placed here.
 * `private_key`: SSH key for AWS EC2 (see step 3 of the [LAPTOP.md Guide](LAPTOP.md))
@@ -130,20 +130,27 @@ yaml - Used to set configuration settings in a standardized way.
 
 ### Base R Runtime Layer Debugging
 
-If there are challenges with the layer build, the following command can be run to interact with the environment inside the docker service used to build the layer. Once inside the Terminal of the Docker container, the individual commands listed in **Dockerfile** can be run. Before running, make sure you have already run `srm deploy` at least once:
+If there are challenges with the layer build, there are ways to enter into an interactive mode. First, make sure that 'srm deploy' has already been run once, and that there is a VM running.  Entering 'srm status' will indicate status. Next, enter 'srm ssh', to login to the VM itself.  Then use the following command to login to the Docker container terminal itself:
+
 ```
 docker run -it lambda-r:build-4.0.2 bash
 ```
 
-If you're curious what shared libraries outside of the installed R folder is being used in the build environment, you can run the following to get a list:
+There's a way to see which shared libraries are being used in the build environment by running  the following command to get a list:
 ```
-ldd /usr/lib64/R/bin/exec/R
+ldd /opt/R/bin/exec/R
 ```
 
-Additional log entries from the runtime layer can be placed in the Lambda Service by adding print commands to the following file and function.  Also, example print statements are provided:
+There's also a way to introduce print log statements int the Lambda R Runtime layer that will add log entries into AWS CloudWatch from AWS Lambda.  Once inside the Docker container, change directories and view the following file:
+```
+ServeRmore/layer/r-runtime/build/layers/r-runtime/build/layer/R/library/base/R/Rprofile
+```
+Then browse until you encounter the following function:
+```
+.First.sys()
+```
 
-`FILENAME`: ServeRmore/layer/r-runtime/build/layers/r-runtime/build/layer/R/library/base/R/Rprofile
-`METHOD`: .First.sys()
+Next, enter any of the following print statements, or enter your own:
 ```
 print(paste0("PATH = ", Sys.getenv("PATH")))
 print(paste0("Listing files in PATH /usr/local/bin:", paste(list.files("/usr/local/bin/"), collapse = ",")))
@@ -153,6 +160,13 @@ print(paste0("Listing files in PATH /opt/bin", paste(list.files("/opt/bin/"), co
 print(paste0("R.home() = ", file.path(R.home())))
 print(paste0("Listing files in ", file.path(R.home(), "library"), ":", paste(list.files(file.path(R.home(), "library")), collapse = ",")))
 ```
+
+Finally, exit the Docker container, and while still in the VM, execute the Deploy.sh script:
+```
+./deploy.sh
+```
+
+Your new R Runtime Layer should now be published with your print statements.
 
 ### Base R Runtime Layer Limitations
 
