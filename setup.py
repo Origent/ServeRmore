@@ -15,7 +15,7 @@ setup(
     long_description_content_type="text/markdown",
     author='Origent Data Sciences',
     author_email='cloudhosting@origent.com',
-    scripts=['bin/srm', 'README.md', 'layers/README.md'],
+    scripts=['bin/srm', 'README.md'],
     py_modules = ['ServeRmore', 'srvl_config', 'VERSION'],
     install_requires=['paramiko', 'boto3', 'PyYAML', 'requests'],
     python_requires='>=3',
