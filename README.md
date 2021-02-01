@@ -161,9 +161,9 @@ print(paste0("R.home() = ", file.path(R.home())))
 print(paste0("Listing files in ", file.path(R.home(), "library"), ":", paste(list.files(file.path(R.home(), "library")), collapse = ",")))
 ```
 
-Finally, exit the Docker container, and while still in the VM, execute the Deploy.sh script:
+Finally, exit the Docker container, and your VM, then re-run the deploy command:
 ```
-./deploy.sh
+srm deploy
 ```
 
 Your new R Runtime Layer should now be published with your print statements.
