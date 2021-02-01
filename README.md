@@ -119,12 +119,12 @@ srm terminate
 Double check the AWS Lambda Console and Layers registry as well as your **serveRmore.yaml** file to confirm that your layer was indeed published.
 
 The following is included and required for the Runtime to work:
-R 4.0.2 - In theory, all builds of 4.x should work, but only 4.0.2 has been tested.
-httr - Used to communicate with other web APIs.
-jsonlite - Used to load, parse, and create JSON documents.
-aws.s3 - Used to interact with AWS S3 storage buckets.
-logging - Used to help create well formed log streams.
-yaml - Used to set configuration settings in a standardized way.
+* R 4.0.2 - In theory, all builds of 4.x should work, but only this version has passed testing.
+* httr - Used to communicate with other web APIs.
+* jsonlite - Used to load, parse, and create JSON documents.
+* aws.s3 - Used to interact with AWS S3 storage buckets.
+* logging - Used to help create well formed log streams.
+* yaml - Used to set configuration settings in a standardized way.
 
 **Note:**: The build and compilation process uses a Docker image called [docker-lambda](https://github.com/lambci/docker-lambda).
 
