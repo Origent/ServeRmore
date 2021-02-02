@@ -1,20 +1,23 @@
 #!/bin/bash
 
 set -euo pipefail
-
-if [[ -z ${1+x} ]];
-then
-    echo 'version number required'
-    exit 1
-else
-    VERSION=$1
-fi
+VERSION=$1
+PACKAGES=$2
 
 BASE_DIR=$(pwd)
-./docker_build.sh ${VERSION}
-cd ${BASE_DIR}/r
-./build.sh ${VERSION}
-cd ${BASE_DIR}/r-runtime
-./build.sh
-cd ${BASE_DIR}/r-gbm
-./build.sh ${VERSION}
+BUILD_DIR=${BASE_DIR}/build
+mkdir -p ${BUILD_DIR}/bin/
+mkdir -p ${BUILD_DIR}/layer/R/
+docker build . -t lambda-r:build-${VERSION} --build-arg VERSION=${VERSION} --build-arg PACKAGES="${PACKAGES}"
+docker run -v ${BUILD_DIR}/bin/:/var/r lambda-r:build-${VERSION}
+sudo chown -R $(whoami):$(whoami) ${BUILD_DIR}/bin/
+cp ${BASE_DIR}/src/* ${BUILD_DIR}/layer/
+cd ${BUILD_DIR}/layer/
+cp -r ${BUILD_DIR}/bin/* R/
+recommended=(boot class cluster codetools foreign KernSmooth MASS mgcv nlme nnet rpart spatial)
+for package in "${recommended[@]}"
+do
+   rm -r R/library/${package}/
+done
+chmod -R 755 .
+cd ${BASE_DIR}
