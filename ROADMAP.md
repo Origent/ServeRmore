@@ -3,6 +3,7 @@
 v0.1.1 - Additional Updates
 * Add multi-layer support
 * Remove the dependency of cloning the repo locally along with installing the utility to build layers
+* Redirect hyperlinks for helper documentation in README
 
 ## Changelog
 
