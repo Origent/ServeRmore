@@ -130,7 +130,7 @@ The following is included and required for the Runtime to work:
 
 ### Base R Runtime Layer Debugging
 
-If there are challenges with the layer build, there are ways to enter into an interactive mode. First, make sure that you've already run deploy once before without terminating. Next, check the status to ensure a VM is running. Finally login to the VM itself and then the Docker container through the following commands:
+If there are challenges with the layer build, there are ways to enter into an interactive mode. First, make sure that you've already run deploy once before without terminating. Next, check the status to ensure a VM is running. Finally, login to the VM itself and then the Docker container through the following commands:
 
 ```
 srm deploy
@@ -144,7 +144,7 @@ There's a way to see which shared libraries are being used in the build environm
 ldd /opt/R/bin/exec/R
 ```
 
-There's also a way to introduce print log statements int the Lambda R Runtime layer that will add log entries into AWS CloudWatch from AWS Lambda.  Once inside the Docker container, change directories and view the following file:
+There's also a way to introduce print log statements in the Lambda R Runtime layer that will add log entries into AWS CloudWatch from AWS Lambda.  Once inside the Docker container, change directories and view the following file:
 ```
 ServeRmore/layer/r-runtime/build/layers/r-runtime/build/layer/R/library/base/R/Rprofile
 ```
