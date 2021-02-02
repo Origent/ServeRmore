@@ -25,10 +25,7 @@ def main():
         config=srvl_config.srvlConfig()
         config.help()
     elif len(sys.argv) == 3:
-        if sys.argv[1] == 'lambda' and sys.argv[2] == "init":
-            func = ServeRmore.srm()
-            func.lambda_init()
-        elif sys.argv[1] == 'lambda' and sys.argv[2] == "list":
+        if sys.argv[1] == 'lambda' and sys.argv[2] == "list":
             func = ServeRmore.srm()
             func.lambda_list()
         elif sys.argv[1] == 'lambda' and sys.argv[2] == "create":
@@ -57,40 +54,22 @@ def main():
         config.version()
     elif sys.argv[1] == 'create':
         vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.create("srm_builder")
-    elif sys.argv[1] == 'terminate':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.terminate()
-    elif sys.argv[1] == 'status':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.status()
-    elif sys.argv[1] == 'update':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.update()
-    elif sys.argv[1] == 'package':
-        vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.package()
+        vm.create()
     elif sys.argv[1] == 'deploy':
         vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.deploy()
-    elif sys.argv[1] == 'test':
+        vm.deploy()
+    elif sys.argv[1] == 'status':
         vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.test()
+        vm.status()
+    elif sys.argv[1] == 'terminate':
+        vm = ServeRmore.srm()
+        vm.terminate()
     elif sys.argv[1] == 'ssh':
         vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.ssh()
-    elif sys.argv[1] == 'sftp':
+        vm.ssh()
+    elif sys.argv[1] == 'cpu':
         vm = ServeRmore.srm()
-        if vm.cc.print_msg < 1:
-            vm.sftp()
+        vm.cpu()
     else:
         config=srvl_config.srvlConfig()
         config.help()
