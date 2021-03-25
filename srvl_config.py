@@ -19,6 +19,11 @@ class srvlConfig:
         else:
             print(yaml.dump(self.load(), default_flow_style=False))
 
+    def set_env(self, env_str):
+        self.settings["env"] = env_str
+        with io.open(self.file, 'w', encoding='utf8') as outfile:
+            yaml.dump(self.settings, outfile, default_flow_style=False, allow_unicode=True)
+
     def version(self):
         print("ServeRmore "+VERSION.srm_VERSION)
 
@@ -31,8 +36,14 @@ class srvlConfig:
                 self.write(key,name, self.settings[key][name])
 
     def set(self, key, name, value):
-        self.settings[key][name] = value
-        self.write(key,name,value)
+        if key == "build_vm":
+            self.settings[key][name] = value
+            self.write(key,name,value)
+        else:
+            env = self.settings["env"]
+            self.settings[env][key][name] = value
+            with io.open(self.file, 'w', encoding='utf8') as outfile:
+                yaml.dump(self.settings, outfile, default_flow_style=False, allow_unicode=True)
 
     def read(self, key, name):
         self.settings = self.load()
@@ -46,15 +57,6 @@ class srvlConfig:
         self.settings[key][name] = value
         with io.open(self.file, 'w', encoding='utf8') as outfile:
             yaml.dump(self.settings, outfile, default_flow_style=False, allow_unicode=True)
-
-    def load(self):
-        if not self.exists():
-            self.settings = self.reset()
-            with io.open(self.file, 'w', encoding='utf8') as outfile:
-                yaml.dump(self.settings, outfile, default_flow_style=False, allow_unicode=True)
-        with open(self.file, 'r') as stream:
-            return yaml.load(stream, Loader=yaml.FullLoader)
-
 
     def load(self):
         if not self.exists():

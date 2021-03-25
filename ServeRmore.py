@@ -21,43 +21,72 @@ class srm:
     def lambda_create(self):
         import boto3
         client = boto3.client('lambda')
+        env = self.cc.settings["env"]
         response = client.create_function(
-            FunctionName=self.cc.settings["function"]["name"],
-            Runtime=self.cc.settings["function"]["runtime"],
-            Role=self.cc.settings["function"]["arn_role"],
-            Handler=self.cc.settings["function"]["handler"],
+            FunctionName=self.cc.settings[env]["function"]["name"],
+            Runtime=self.cc.settings[env]["function"]["runtime"],
+            Role=self.cc.settings[env]["function"]["arn_role"],
+            Handler=self.cc.settings[env]["function"]["handler"],
             Code={
-                'S3Bucket': self.cc.settings["aws"]["s3_bucket"],
-                'S3Key': self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
+                'S3Bucket': self.cc.settings[env]["aws"]["s3_bucket"],
+                'S3Key': self.cc.settings[env]["aws"]["s3_key"]+"/"+self.cc.settings[env]["function"]["zip_file_name"]
             },
             Timeout=60,
             MemorySize=3008,
             Layers=[
-                self.cc.settings["runtime_layer"]["arn"]
+                self.cc.settings[env]["runtime_layer"]["arn"]
             ]
         )
 
     def lambda_invoke(self):
         import boto3
         client = boto3.client('lambda')
+        env = self.cc.settings["env"]
         response = client.invoke(
-            FunctionName=self.cc.settings["function"]["name"]
+            FunctionName=self.cc.settings[env]["function"]["name"]
         )
 
     def lambda_update(self):
         import boto3
         client = boto3.client('lambda')
+        env = self.cc.settings["env"]
         response = client.update_function_code(
-            FunctionName=self.cc.settings["function"]["name"],
-            S3Bucket=self.cc.settings["aws"]["s3_bucket"],
-            S3Key=self.cc.settings["aws"]["s3_key"]+"/"+self.cc.settings["function"]["zip_file_name"]
+            FunctionName=self.cc.settings[env]["function"]["name"],
+            S3Bucket=self.cc.settings[env]["aws"]["s3_bucket"],
+            S3Key=self.cc.settings[env]["aws"]["s3_key"]+"/"+self.cc.settings[env]["function"]["zip_file_name"]
         )
-
+        if self.cc.settings[env]["additional_layer"]["name"]:
+            response = client.update_function_configuration(
+                FunctionName=self.cc.settings[env]["function"]["name"],
+                Role=self.cc.settings[env]["function"]["arn_role"],
+                Handler=self.cc.settings[env]["function"]["handler"],
+                Runtime=self.cc.settings[env]["function"]["runtime"],
+                Timeout=60,
+                MemorySize=3008,
+                Layers=[
+                    self.cc.settings[env]["runtime_layer"]["arn"],
+                    self.cc.settings[env]["additional_layer"]["arn"]
+                ]
+            )
+        else:
+            response = client.update_function_configuration(
+                FunctionName=self.cc.settings[env]["function"]["name"],
+                Role=self.cc.settings[env]["function"]["arn_role"],
+                Handler=self.cc.settings[env]["function"]["handler"],
+                Runtime=self.cc.settings[env]["function"]["runtime"],
+                Timeout=60,
+                MemorySize=3008,
+                Layers=[
+                    self.cc.settings[env]["runtime_layer"]["arn"]
+                ]
+            )
+        
     def lambda_destroy(self):
         import boto3
         client = boto3.client('lambda')
+        env = self.cc.settings["env"]
         response = client.delete_function(
-            FunctionName=self.cc.settings["function"]["name"]
+            FunctionName=self.cc.settings[env]["function"]["name"]
         )
 
     def create(self):
@@ -122,21 +151,42 @@ class srm:
 
     def deploy(self):
         if self.cc.settings["build_vm"]["instance_id"]:
+            env = self.cc.settings["env"]
             from pathlib import Path
-            cloud_connect = srvl_config.srvlConnect()
-            cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
-            print("Running Build script for Lambda Layer...")
-            cloud_connect.run_ssh("./build.sh " + self.cc.settings["runtime_layer"]["r_version"] +" \""+ str(self.cc.settings["runtime_layer"]["r_packages"]) + "\" 2>&1")
-            print("Running Deploy script for Lambda Layer...")
-            cloud_connect.run_ssh("./deploy.sh " + self.cc.settings["runtime_layer"]["r_version"] + " " + self.cc.settings["aws"]["s3_bucket"] + " " + self.cc.settings["aws"]["s3_key"] + " 2>&1")
-            cloud_connect.terminate_ssh()
-            import boto3
-            client = boto3.client('lambda')
-            response = client.list_layer_versions(
-                LayerName='r-runtime-4_0_2'
-            )
-            print("Updating Published Version for Lambda Layer...")
-            self.cc.set("runtime_layer", "arn", response["LayerVersions"][0]["LayerVersionArn"])
+            if self.cc.settings[env]["runtime_layer"]["name"]:
+                cloud_connect = srvl_config.srvlConnect()
+                cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+                print("Running build script for runtime Lambda Layer...")
+                cloud_connect.run_ssh("./runtime/build.sh " + self.cc.settings[env]["runtime_layer"]["r_version"] +" \""+ str(self.cc.settings[env]["runtime_layer"]["r_packages"]) + "\" 2>&1")
+                print("Running deploy script for runtime Lambda Layer...")
+                cloud_connect.run_ssh("./runtime/deploy.sh " + self.cc.settings[env]["runtime_layer"]["name"] + " " + self.cc.settings[env]["aws"]["s3_bucket"] + " " + self.cc.settings[env]["aws"]["s3_key"] + " 2>&1")
+                cloud_connect.terminate_ssh()
+                import boto3
+                client = boto3.client('lambda')
+                response = client.list_layer_versions(
+                    LayerName=self.cc.settings[env]["runtime_layer"]["name"]
+                )
+                print("Updating Published Version for runtime Lambda Layer...")
+                self.cc.set("runtime_layer", "arn", response["LayerVersions"][0]["LayerVersionArn"])
+                if self.cc.settings[env]["additional_layer"]["name"]:
+                    cloud_connect = srvl_config.srvlConnect()
+                    cloud_connect.initiate_ssh("ec2-user", self.cc.settings["build_vm"]["private_key"], self.cc.settings["build_vm"]["domain_name"])
+                    print("Running build script for additional Lambda Layer...")
+                    cloud_connect.run_ssh("./additional/build.sh " + self.cc.settings[env]["runtime_layer"]["r_version"] +" \""+ str(self.cc.settings[env]["additional_layer"]["r_packages"]) + "\" 2>&1")
+                    print("Running deploy script for additional Lambda Layer...")
+                    cloud_connect.run_ssh("./additional/deploy.sh " + self.cc.settings[env]["additional_layer"]["name"] + " " + self.cc.settings[env]["aws"]["s3_bucket"] + " " + self.cc.settings[env]["aws"]["s3_key"] + " 2>&1")
+                    cloud_connect.terminate_ssh()
+                    import boto3
+                    client = boto3.client('lambda')
+                    response = client.list_layer_versions(
+                        LayerName=self.cc.settings[env]["additional_layer"]["name"]
+                    )
+                    print("Updating Published Version for additional Lambda Layer...")
+                    self.cc.set("additional_layer", "arn", response["LayerVersions"][0]["LayerVersionArn"])
+                else: 
+                    print("No additional layer named.")
+            else: 
+                print("No runtime layer named.")
         else:
             print("No instance is allocated.")
 
@@ -200,15 +250,23 @@ class srm:
         cloud_connect.run_ssh("mkdir -p /home/ec2-user/.aws")
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'credentials')
         cloud_connect.upload_file_ssh(str(Path.home())+'/.aws/', '/home/ec2-user/.aws/', 'config')
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/', '/home/ec2-user/', "Dockerfile")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/', '/home/ec2-user/', "build.sh")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/', '/home/ec2-user/', "deploy.sh")
-        cloud_connect.run_ssh("mkdir -p /home/ec2-user/src")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/src/', '/home/ec2-user/src/', "bootstrap")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/src/', '/home/ec2-user/src/', "bootstrap.R")
-        cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/src/', '/home/ec2-user/src/', "runtime.R")
-        cloud_connect.run_ssh("chmod -R ugo+x build.sh deploy.sh ./src")
-        cloud_connect.terminate_ssh()
+        env = self.cc.settings["env"]
+        if self.cc.settings[env]["runtime_layer"]["name"]:
+            cloud_connect.run_ssh("mkdir -p /home/ec2-user/runtime")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/', '/home/ec2-user/runtime/', "Dockerfile")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/', '/home/ec2-user/runtime/', "build.sh")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/', '/home/ec2-user/runtime/', "deploy.sh")
+            cloud_connect.run_ssh("mkdir -p /home/ec2-user/runtime/src")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/src/', '/home/ec2-user/runtime/src/', "bootstrap")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/src/', '/home/ec2-user/runtime/src/', "bootstrap.R")
+            cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/runtime/src/', '/home/ec2-user/runtime/src/', "runtime.R")
+            cloud_connect.run_ssh("chmod -R ugo+x runtime")
+            if self.cc.settings[env]["additional_layer"]["name"]:
+                cloud_connect.run_ssh("mkdir -p /home/ec2-user/additional")
+                cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/additional/', '/home/ec2-user/additional/', "build.sh")
+                cloud_connect.upload_file_ssh(str(Path.home())+'/ServeRmore/layers/additional/', '/home/ec2-user/additional/', "deploy.sh")
+                cloud_connect.run_ssh("chmod -R ugo+x additional")
+            cloud_connect.terminate_ssh()
 
     def restart_docker_service(self):
         print("Restart Docker Service...")

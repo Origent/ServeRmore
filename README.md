@@ -37,19 +37,6 @@ git clone git@github.com:Origent/ServeRmore.git
 Create a new file called "**serveRmore.yaml**" in your home directory. The template for the YAML file is shown below:  
 
 ```
-aws:
-  s3_bucket: null
-  s3_key: null
-function:
-  arn_role: arn:aws:iam::<AWS_ID>:role/lambda_basic_execution
-  handler: lambda.handler
-  name: null
-  zip_file_name: null
-  runtime: provided.al2
-runtime_layer:
-  arn: arn:aws:lambda:us-east-1:<AWS_ID>:layer:<name>:<version>
-  r_packages: httr logging yaml jsonlite aws.s3 
-  r_version: 4.0.2
 build_vm:
   ami: ami-02507631a9f7bc956
   default_security_group: null
@@ -59,6 +46,26 @@ build_vm:
   domain_name: null
   instance_id: null
   private_key: null
+dev:
+  additional_layer:
+    arn: null
+    name: null
+    r_packages: null
+  aws:
+    s3_bucket: null
+    s3_key: null
+  function:
+    arn_role: arn:aws:iam::<AWS_ID>:role/lambda_basic_execution
+    handler: lambda.handler
+    name: null
+    zip_file_name: null
+    runtime: provided.al2
+  runtime_layer:
+    name: r-runtime-4_0_3
+    arn: arn:aws:lambda:us-east-1:<AWS_ID>:layer:<name>:<version>
+    r_packages: httr logging yaml jsonlite aws.s3 
+    r_version: 4.0.3
+env: dev
 ```
 
 For deploying a new Lambda function only (i.e. not including a Lambda _layer_), at the least you will need the following parameters: 
@@ -98,6 +105,7 @@ srm status
 
 4. To deploy your zip file directly to Lambda, try out our new workflow here.
 ```
+srm env <name-of-env-in-yaml> (i.e. dev)
 srm lambda create
 srm lambda update
 srm lambda invoke
@@ -119,7 +127,7 @@ srm terminate
 Double check the AWS Lambda Console and Layers registry as well as your **serveRmore.yaml** file to confirm that your layer was indeed published.
 
 The following is included and required for the Runtime to work:
-* R 4.0.2 - In theory, all builds of 4.x should work, but only this version has passed testing.
+* R 4.0.x - In theory, all builds of 4.x should work, but only this version has passed testing.
 * httr - Used to communicate with other web APIs.
 * jsonlite - Used to load, parse, and create JSON documents.
 * aws.s3 - Used to interact with AWS S3 storage buckets.
@@ -136,7 +144,7 @@ If there are challenges with the layer build, there are ways to enter into an in
 srm deploy
 srm status
 srm ssh
-docker run -it lambda-r:build-4.0.2 bash
+docker run -it lambda-r:build-4.0.x bash
 ```
 
 There's a way to see which shared libraries are being used in the build environment by running  the following command to get a list:
