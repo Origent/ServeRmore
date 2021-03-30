@@ -4,11 +4,11 @@ set -euo pipefail
 VERSION=$1
 PACKAGES=$2
 
-BASE_DIR=$(pwd)
+BASE_DIR=$(pwd)/runtime
 BUILD_DIR=${BASE_DIR}/build
 mkdir -p ${BUILD_DIR}/bin/
 mkdir -p ${BUILD_DIR}/layer/R/
-docker build . -t lambda-r:build-${VERSION} --build-arg VERSION=${VERSION} --build-arg PACKAGES="${PACKAGES}"
+docker build ./runtime -t lambda-r:build-${VERSION} --build-arg VERSION=${VERSION} --build-arg PACKAGES="${PACKAGES}"
 docker run -v ${BUILD_DIR}/bin/:/var/r lambda-r:build-${VERSION}
 sudo chown -R $(whoami):$(whoami) ${BUILD_DIR}/bin/
 cp ${BASE_DIR}/src/* ${BUILD_DIR}/layer/

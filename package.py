@@ -10,7 +10,11 @@ def package_build():
 def package_test():
     import subprocess
     import sys
+    COMMAND="sudo pip3 uninstall serveRmore -y"
+    result = subprocess.call(COMMAND,shell=True)
     COMMAND="pip3 uninstall serveRmore -y"
+    result = subprocess.call(COMMAND,shell=True)
+    COMMAND="sudo pip3 install dist/serveRmore-"+VERSION.srm_VERSION+".tar.gz"
     result = subprocess.call(COMMAND,shell=True)
     COMMAND="pip3 install dist/serveRmore-"+VERSION.srm_VERSION+".tar.gz"
     result = subprocess.call(COMMAND,shell=True)

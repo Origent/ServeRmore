@@ -40,6 +40,9 @@ def main():
         elif sys.argv[1] == 'lambda' and sys.argv[2] == "destroy":
             func = ServeRmore.srm()
             func.lambda_destroy()
+        elif sys.argv[1] == 'env':
+            config=srvl_config.srvlConfig()
+            config.set_env(sys.argv[2])
         else:
             config=srvl_config.srvlConfig()
             config.help()
