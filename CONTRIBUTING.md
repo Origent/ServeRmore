@@ -13,12 +13,12 @@ Please be sure to create a PyPi.org account and request access to deploy a packa
 
 Install the deploy dependency:
 ```
-pip3 install --user --upgrade twine
+python3 -m pip install --user --upgrade twine
 ```
 
 Build your package and upload it to PyPi:
 ```
 python3 setup.py sdist bdist_wheel
-twine upload dist/*
+python3 -m twine upload --repository pypi dist/*
 ```
 
