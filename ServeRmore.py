@@ -55,6 +55,16 @@ class srm:
             S3Bucket=self.cc.settings[env]["aws"]["s3_bucket"],
             S3Key=self.cc.settings[env]["aws"]["s3_key"]+"/"+self.cc.settings[env]["function"]["zip_file_name"]
         )
+        
+        waiter = client.get_waiter('function_updated')
+        waiter.wait(
+            FunctionName=self.cc.settings[env]["function"]["name"],
+            WaiterConfig={
+                'Delay': 5,
+                'MaxAttempts': 60
+            }
+        )
+        
         if self.cc.settings[env]["additional_layer"]["name"]:
             response = client.update_function_configuration(
                 FunctionName=self.cc.settings[env]["function"]["name"],
